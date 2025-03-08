@@ -1,0 +1,71 @@
+.settings-page {
+  display: flex;
+  height: 100vh;
+}
+
+/* Sidebar should be fixed to the left */
+.settings-page .sidebar {
+  width: 250px;
+  background-color: #222;
+  color: white;
+}
+
+/* Main content should fill the rest of the screen */
+.settings-page .main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+/* Ensures header is fixed at the top */
+.settings-header {
+  width: 100%;
+  background-color: #007bff;
+  color: white;
+  padding: 15px;
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+/* Settings content styling */
+.settings-container {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}
+
+.settings-section {
+  margin-top: 15px;
+  padding: 10px;
+  border-left: 5px solid #007bff;
+  background-color: #f8f9fa;
+}
+
+.settings-section h3 {
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.settings-section p {
+  font-size: 1rem;
+  color: #555;
+}
+
+.settings-options {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #e3e3e3;
+  border-radius: 5px;
+}
+
+.settings-options label {
+  display: block;
+  margin-top: 5px;
+}
+
+.settings-options input {
+  margin-right: 5px;
+}
