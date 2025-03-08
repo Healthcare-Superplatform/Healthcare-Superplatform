@@ -1,0 +1,50 @@
+.medical-records-page {
+    display: flex;
+    height: 100vh;
+  }
+  
+  .medical-records-page .main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+  }
+  
+  .medical-records-header {
+    background-color: #007bff;
+    color: white;
+    padding: 15px;
+    text-align: center;
+    font-size: 1.5rem;
+  }
+  
+  .medical-records-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+  }
+  
+  .medical-records-container h3 {
+    font-size: 1.2rem;
+  }
+  
+  .medical-records-container p {
+    font-size: 1rem;
+    color: #555;
+  }
+  
+  .download-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .download-btn:hover {
+    background-color: #0056b3;
+  }
+  
