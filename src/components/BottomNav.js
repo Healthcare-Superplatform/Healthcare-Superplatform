@@ -8,7 +8,8 @@ const BottomNav = () => {
       <Link to="/">🏠</Link>
       <Link to="/appointments">📅</Link>
       <Link to="/medical-records">📜</Link>
-      <Link to="/lifestyle-insights">💡</Link>
+      <Link to="/job-portal">💼</Link>
+      <Link to="/ai-health-assistant">🤖</Link>
       <Link to="/settings">⚙️</Link>
     </nav>
   );
