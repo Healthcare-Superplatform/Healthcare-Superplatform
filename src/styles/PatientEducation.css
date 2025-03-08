@@ -1,0 +1,29 @@
+.patient-education {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+  }
+  
+  .patient-education h2 {
+    font-size: 1.5rem;
+    color: #007bff;
+  }
+  
+  .language-selection {
+    margin-top: 10px;
+  }
+  
+  .language-selection select {
+    padding: 5px;
+    border-radius: 5px;
+  }
+  
+  .education-content {
+    margin-top: 15px;
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 5px;
+  }
+  

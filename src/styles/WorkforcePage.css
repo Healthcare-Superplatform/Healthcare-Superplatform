@@ -1,0 +1,20 @@
+/* Workforce Page Layout */
+.page-layout {
+  display: flex;
+  height: 100vh;
+}
+
+/* Main Content Area */
+.main-content {
+  flex: 1;
+  padding: 20px;
+  margin-left: 240px; /* Adjust according to sidebar */
+  box-sizing: border-box;
+}
+
+/* Adjust for Collapsed Sidebar on Mobile */
+@media screen and (max-width: 768px) {
+  .main-content {
+    margin-left: 60px;
+  }
+}
