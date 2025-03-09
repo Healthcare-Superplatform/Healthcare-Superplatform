@@ -68,6 +68,8 @@ const Sidebar = () => {
       <ul>
         <li><Link to="/" onClick={(e) => handleMenuItemClick(e, '/')} className={activeItem === '/' ? 'active' : ''}>🏠 Dashboard</Link></li>
         <li><Link to="/appointments" onClick={(e) => handleMenuItemClick(e, '/appointments')} className={activeItem === '/appointments' ? 'active' : ''}>📅 Appointments</Link></li>
+        <li><Link to="/health-status" onClick={(e) => handleMenuItemClick(e, '/health-status')} className={activeItem === '/health-status' ? 'active' : ''}>💖 Health Status</Link></li>
+        <li><Link to="/health-concern" onClick={(e) => handleMenuItemClick(e, '/health-concern')} className={activeItem === '/health-concern' ? 'active' : ''}>🚑 Health Concerns</Link></li>
         <li><Link to="/medical-records" onClick={(e) => handleMenuItemClick(e, '/medical-records')} className={activeItem === '/medical-records' ? 'active' : ''}>📜 Medical Records</Link></li>
         <li><Link to="/lifestyle-insights" onClick={(e) => handleMenuItemClick(e, '/lifestyle-insights')} className={activeItem === '/lifestyle-insights' ? 'active' : ''}>💡 Lifestyle Insights</Link></li>
         <li><Link to="/job-portal" onClick={(e) => handleMenuItemClick(e, '/job-portal')} className={activeItem === '/job-portal' ? 'active' : ''}>💼 Healthcare Jobs</Link></li>

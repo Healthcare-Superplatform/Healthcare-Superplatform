@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
 import AppointmentsPage from './pages/AppointmentsPage';
+import HealthConcernPage from './pages/HealthConcernPage';
+import HealthStatusPage from './pages/HealthStatusPage';
 import MedicalRecordsPage from './pages/MedicalRecordsPage';
 import LifestyleInsightsPage from './pages/LifestyleInsightsPage';
 import WorkforcePage from './pages/WorkforcePage';
@@ -31,6 +33,8 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/appointments" element={<AppointmentsPage />} />
+            <Route path="/health-status" element={<HealthStatusPage />} /> 
+            <Route path="/health-concern" element={<HealthConcernPage />} /> 
             <Route path="/medical-records" element={<MedicalRecordsPage />} />
             <Route path="/lifestyle-insights" element={<LifestyleInsightsPage />} />
             <Route path="/workforce" element={<WorkforcePage />} />

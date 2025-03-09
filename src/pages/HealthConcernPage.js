@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
-import Appointments from '../components/Appointments';
-import '../styles/AppointmentsPage.css';
+import HealthConcern from '../components/HealthConcern';
+import '../styles/HealthConcernPage.css';
 
-const AppointmentsPage = () => {
+const HealthConcernPage = () => {
   // ✅ State for storing user ID (Can be retrieved from authentication or local storage)
   const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -28,20 +28,20 @@ const AppointmentsPage = () => {
   }, []);
 
   return (
-    <div className="appointments-page">
+    <div className="health-concern-page">
       <Sidebar />
       <div className="main-content">
         <Header />
 
         {/* ✅ Show loading state until user ID is available */}
         {loading ? (
-          <p>⏳ Loading appointments...</p>
+          <p>⏳ Loading health concerns...</p>
         ) : (
-          <Appointments userId={userId} />
+          <HealthConcern userId={userId} />
         )}
       </div>
     </div>
   );
 };
 
-export default AppointmentsPage;
+export default HealthConcernPage;
