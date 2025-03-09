@@ -1,17 +1,19 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import '../styles/Header.css';
+import { useNavigate } from 'react-router-dom';
 
 const Header = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("userId"); // ✅ Clear user session
+    localStorage.removeItem("userName");
+    navigate("/login");
+  };
+
   return (
     <header className="header">
-      <h1 className="header-logo">SuperPlatform</h1>
-      <div className="header-icons">
-        <span>🔔</span>
-        <Link to="/settings">
-          <img src="/profile.png" alt="Profile" className="profile-icon" />
-        </Link>
-      </div>
+      <h1>🏥 SuperPlatform</h1>
+      <button className="logout-btn" onClick={handleLogout}>🚪 Logout</button>
     </header>
   );
 };

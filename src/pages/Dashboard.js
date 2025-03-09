@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import Header from '../components/Header';
+import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import Header from '../components/Header';
 import UserProfile from '../components/UserProfile';
 import HealthStatus from '../components/HealthStatus';
 import HealthConcern from '../components/HealthConcern';
@@ -10,38 +11,25 @@ import BottomNav from '../components/BottomNav';
 import '../styles/Dashboard.css';
 
 const Dashboard = () => {
-  // ✅ State for storing user ID (Can be retrieved from authentication or local storage)
-  const [userId, setUserId] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState(localStorage.getItem("userId"));
+  const navigate = useNavigate();
 
-  // ✅ Simulated fetch for user authentication (Replace with actual authentication logic)
   useEffect(() => {
-    const fetchUserId = async () => {
-      setLoading(true);
-      try {
-        // Simulating a user login session fetch (Replace this with real authentication logic)
-        const storedUserId = localStorage.getItem("userId") || "101"; // Default user 101
-        setUserId(storedUserId);
-      } catch (error) {
-        console.error("Error fetching user ID:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    const storedUserId = localStorage.getItem("userId");
 
-    fetchUserId();
-  }, []);
+    if (!storedUserId) {
+      navigate("/login"); // ✅ Redirect if user is not logged in
+    } else {
+      setUserId(storedUserId);
+    }
+  }, [navigate]);
 
   return (
     <div className="dashboard">
       <Sidebar />
       <main className="main-content">
         <Header />
-
-        {/* ✅ Show loading state until user ID is available */}
-        {loading ? (
-          <p>⏳ Loading dashboard...</p>
-        ) : (
+        {userId ? (
           <>
             <UserProfile userId={userId} />
             <HealthStatus userId={userId} />
@@ -49,6 +37,8 @@ const Dashboard = () => {
             <Appointments userId={userId} />
             <MedicalRecords userId={userId} />
           </>
+        ) : (
+          <p>⏳ Loading user data...</p>
         )}
       </main>
       <BottomNav />
