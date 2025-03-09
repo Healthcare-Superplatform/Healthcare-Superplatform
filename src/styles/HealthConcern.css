@@ -1,35 +1,19 @@
-.health-concern {
-    background-color: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .health-concern h2 {
-    font-size: 1.5rem;
-  }
-  
-  .critical {
-    background-color: red;
-    color: white;
-    padding: 10px;
-    margin: 5px 0;
-    border-radius: 5px;
-  }
-  
-  .moderate {
-    background-color: orange;
-    color: white;
-    padding: 10px;
-    margin: 5px 0;
-    border-radius: 5px;
-  }
-  
-  .mild {
-    background-color: yellow;
-    color: black;
-    padding: 10px;
-    margin: 5px 0;
-    border-radius: 5px;
-  }
-  
+.bg-white {
+  background-color: white;
+}
+
+.p-4 {
+  padding: 1rem;
+}
+
+.rounded-lg {
+  border-radius: 8px;
+}
+
+.shadow {
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.my-2 {
+  margin: 8px 0;
+}
