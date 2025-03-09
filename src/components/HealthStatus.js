@@ -1,37 +1,51 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/HealthStatus.css';
 
-const HealthStatus = () => {
-  // ✅ State for storing user's health data
+const HealthStatus = ({ userId }) => {
   const [healthData, setHealthData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // ✅ Simulated API fetch (Replace with actual API call)
   useEffect(() => {
-    // Simulated health data (Can be replaced with real-time user data)
-    const fetchedHealthData = {
-      steps: 6500,
-      heartRate: 75,
-      bloodPressure: "118/76",
-      nextDose: "8 PM"
+    if (!userId) return; // Ensure we only fetch data if userId exists
+
+    // ✅ Simulated API call for user-specific health status
+    const fetchHealthStatus = async () => {
+      setLoading(true);
+
+      try {
+        // Simulated database of health data per user
+        const userHealthData = {
+          "101": { steps: 7500, heartRate: 72, bloodPressure: "120/80", nextDose: "8 PM" },
+          "102": { steps: 5000, heartRate: 80, bloodPressure: "130/85", nextDose: "9 PM" },
+        };
+
+        // ✅ Get health status for the logged-in user
+        setHealthData(userHealthData[userId] || null);
+      } catch (error) {
+        console.error("Error fetching health status:", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    setHealthData(fetchedHealthData);
-  }, []);
+    fetchHealthStatus();
+  }, [userId]);
 
   return (
     <div className="health-status">
       <h2>Health Status Summary</h2>
 
-      {/* ✅ Show Loading State if Data is Not Available */}
-      {!healthData ? (
+      {loading ? (
         <p>⏳ Loading health data...</p>
-      ) : (
+      ) : healthData ? (
         <div className="stats">
           <div className="bg-green">🏃 Steps: {healthData.steps}</div>
           <div className="bg-blue">❤️ Heart Rate: {healthData.heartRate} bpm</div>
           <div className="bg-yellow">🩸 Blood Pressure: {healthData.bloodPressure}</div>
           <div className="bg-red">💊 Next Dose: {healthData.nextDose}</div>
         </div>
+      ) : (
+        <p>⚠️ No health data available for this user.</p>
       )}
     </div>
   );

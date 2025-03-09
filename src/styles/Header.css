@@ -1,20 +1,27 @@
 .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #007bff;
-    padding: 15px;
-    color: white;
-  }
-  
-  .header-logo {
-    font-size: 1.5rem;
-    font-weight: bold;
-  }
-  
-  .header-icons {
-    display: flex;
-    gap: 15px;
-    cursor: pointer;
-  }
-  
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #222;
+  color: white;
+  padding: 15px 20px;
+}
+
+h1 {
+  font-size: 1.5rem;
+}
+
+.logout-btn {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  font-size: 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.logout-btn:hover {
+  background-color: #c82333;
+}

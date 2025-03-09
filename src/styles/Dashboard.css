@@ -1,9 +1,18 @@
 .dashboard {
-    display: flex;
-  }
-  
+  display: flex;
+  height: 100vh;
+}
+
+.main-content {
+  flex-grow: 1;
+  padding: 20px;
+  margin-left: 240px; /* Matches Sidebar Width */
+  box-sizing: border-box;
+}
+
+/* ✅ Adjust for smaller screens */
+@media screen and (max-width: 768px) {
   .main-content {
-    flex: 1;
-    padding: 20px;
+    margin-left: 60px;
   }
-  
+}

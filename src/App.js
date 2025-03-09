@@ -22,6 +22,8 @@ import RehabilitationPage from './pages/workforce/RehabilitationPage';
 import MaternityCarePage from './pages/workforce/MaternityCarePage';
 import PediatricCarePage from './pages/workforce/PediatricCarePage';
 import HomeBasedCarePage from './pages/workforce/HomeBasedCarePage';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
 import './styles/App.css';
 
 const App = () => {
@@ -31,7 +33,10 @@ const App = () => {
         <Sidebar />
         <div className="main-content">
           <Routes>
-            <Route path="/" element={<Dashboard />} />
+             <Route path="/" element={<Login />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/appointments" element={<AppointmentsPage />} />
             <Route path="/health-status" element={<HealthStatusPage />} /> 
             <Route path="/health-concern" element={<HealthConcernPage />} /> 

@@ -8,11 +8,11 @@ const Sidebar = () => {
   const sidebarRef = useRef(null);
   const dropdownRef = useRef(null);
 
-  // ✅ Workforce Dropdown State (Starts Closed but Opens if Already Inside Workforce)
+  // ✅ Workforce Dropdown State (Starts Closed but Opens if Inside Workforce)
   const [workforceDropdown, setWorkforceDropdown] = useState(location.pathname.startsWith('/workforce'));
   const [activeItem, setActiveItem] = useState(location.pathname);
 
-  // ✅ Restore Sidebar & Dropdown Scroll Position After Re-Renders
+  // ✅ Ensure Sidebar Scroll Position is Restored After Reload
   useEffect(() => {
     if (sidebarRef.current) {
       const savedScrollPosition = sessionStorage.getItem('sidebarScrollPosition');
@@ -29,7 +29,7 @@ const Sidebar = () => {
     }
   }, []);
 
-  // ✅ Save Sidebar & Dropdown Scroll Position on Scroll
+  // ✅ Save Sidebar Scroll Position on Scroll
   const handleScroll = () => {
     if (sidebarRef.current) {
       sessionStorage.setItem('sidebarScrollPosition', sidebarRef.current.scrollTop);
@@ -39,7 +39,7 @@ const Sidebar = () => {
     }
   };
 
-  // ✅ Save Scroll Position Before Clicking & Navigate
+  // ✅ Handle Click Events to Save Scroll Position & Navigate
   const handleMenuItemClick = (event, path) => {
     event.preventDefault();
 
@@ -54,19 +54,16 @@ const Sidebar = () => {
     navigate(path);
   };
 
-  // ✅ Toggle Workforce Tracker Dropdown & Remove Active from Other Sidebar Items
+  // ✅ Toggle Workforce Tracker Dropdown Without Affecting Sidebar Selection
   const handleDropdownToggle = () => {
     setWorkforceDropdown(!workforceDropdown);
-    
-    // ✅ Remove active state from all sidebar links when clicking Workforce Tracker
-    setActiveItem(null);
   };
 
   return (
     <nav className="sidebar" ref={sidebarRef} onScroll={handleScroll}>
       <h2>🏥 SuperPlatform</h2>
       <ul>
-        <li><Link to="/" onClick={(e) => handleMenuItemClick(e, '/')} className={activeItem === '/' ? 'active' : ''}>🏠 Dashboard</Link></li>
+        <li><Link to="/dashboard" onClick={(e) => handleMenuItemClick(e, '/dashboard')} className={activeItem === '/dashboard' ? 'active' : ''}>🏠 Dashboard</Link></li>
         <li><Link to="/appointments" onClick={(e) => handleMenuItemClick(e, '/appointments')} className={activeItem === '/appointments' ? 'active' : ''}>📅 Appointments</Link></li>
         <li><Link to="/health-status" onClick={(e) => handleMenuItemClick(e, '/health-status')} className={activeItem === '/health-status' ? 'active' : ''}>💖 Health Status</Link></li>
         <li><Link to="/health-concern" onClick={(e) => handleMenuItemClick(e, '/health-concern')} className={activeItem === '/health-concern' ? 'active' : ''}>🚑 Health Concerns</Link></li>
@@ -75,7 +72,7 @@ const Sidebar = () => {
         <li><Link to="/job-portal" onClick={(e) => handleMenuItemClick(e, '/job-portal')} className={activeItem === '/job-portal' ? 'active' : ''}>💼 Healthcare Jobs</Link></li>
         <li><Link to="/patient-education" onClick={(e) => handleMenuItemClick(e, '/patient-education')} className={activeItem === '/patient-education' ? 'active' : ''}>📚 Patient Education</Link></li>
 
-        {/* ✅ Workforce Tracker Dropdown (Now Works Correctly) */}
+        {/* ✅ Workforce Tracker Dropdown */}
         <li>
           <button className={`dropdown-btn ${workforceDropdown ? 'active' : ''}`} onClick={handleDropdownToggle}>
             👩‍⚕️ Workforce Tracker ▾

@@ -1,35 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/Appointments.css';
 
-const Appointments = () => {
-  // ✅ State for storing appointments
+const Appointments = ({ userId }) => {
   const [appointments, setAppointments] = useState([]);
 
-  // ✅ Simulated API fetch (Replace with actual API)
   useEffect(() => {
-    // Simulating a fetch request (Replace this with an actual API call)
-    const fetchedAppointments = [
-      { id: 1, doctor: "Dr. Smith", specialty: "Cardiologist", date: "15 Jan 2024", time: "10:00 AM", location: "City Hospital" },
-      { id: 2, doctor: "Dr. Alice", specialty: "Dermatologist", date: "18 Jan 2024", time: "2:30 PM", location: "Healthcare Clinic" },
-      { id: 3, doctor: "Dr. John", specialty: "Neurologist", date: "20 Jan 2024", time: "11:00 AM", location: "Metro Hospital" }
-    ];
-    setAppointments(fetchedAppointments);
-  }, []);
+    const userAppointments = {
+      "101": [
+        { id: 1, doctor: "Dr. Smith", date: "15 Jan 2024", time: "10:00 AM", location: "City Hospital" }
+      ],
+      "102": [
+        { id: 2, doctor: "Dr. Emma", date: "20 Jan 2024", time: "2:00 PM", location: "Green Clinic" }
+      ]
+    };
+
+    setAppointments(userAppointments[userId] || []);
+  }, [userId]);
 
   return (
     <div className="appointments">
       <h2>Upcoming Appointments</h2>
-      
-      {appointments.length === 0 ? (
-        <p>🔍 No upcoming appointments found.</p>
-      ) : (
-        appointments.map((appointment) => (
-          <div key={appointment.id} className="appointment-details">
-            <p>👨‍⚕️ <strong>{appointment.doctor}</strong> - {appointment.specialty}</p>
-            <p>📅 <strong>Date:</strong> {appointment.date} | ⏰ <strong>Time:</strong> {appointment.time}</p>
-            <p>📍 <strong>Location:</strong> {appointment.location}</p>
+      {appointments.length > 0 ? (
+        appointments.map((appt) => (
+          <div key={appt.id} className="appointment-details">
+            <p>👨‍⚕️ <strong>{appt.doctor}</strong></p>
+            <p>📅 <strong>Date:</strong> {appt.date} | ⏰ <strong>Time:</strong> {appt.time}</p>
+            <p>📍 <strong>Location:</strong> {appt.location}</p>
           </div>
         ))
+      ) : (
+        <p>✅ No upcoming appointments.</p>
       )}
     </div>
   );
