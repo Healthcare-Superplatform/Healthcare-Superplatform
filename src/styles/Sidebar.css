@@ -1,136 +1,118 @@
-/* Sidebar */
+/* ✅ Sidebar - General Styles */
 .sidebar {
   width: 240px;
   height: 100vh;
-  background-color: #222;
-  color: white;
-  padding: 20px;
   position: fixed;
   left: 0;
   top: 0;
-  overflow-y: auto; /* ✅ Allows vertical scrolling */
-  overflow-x: hidden; /* ✅ Prevents horizontal scrolling */
+  background-color: #222;
+  color: white;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 20px;
   scrollbar-width: thin;
   scrollbar-color: #555 #222;
 }
 
-/* Scrollbar for Webkit Browsers (Chrome, Safari) */
+/* ✅ Sidebar Scrollbar */
 .sidebar::-webkit-scrollbar {
   width: 8px;
 }
-
-.sidebar::-webkit-scrollbar-track {
-  background: #222;
-}
-
 .sidebar::-webkit-scrollbar-thumb {
   background: #555;
   border-radius: 4px;
 }
-
 .sidebar::-webkit-scrollbar-thumb:hover {
   background: #777;
 }
 
-/* Sidebar Title */
-.sidebar h2 {
-  font-size: 1.5rem;
-  margin-bottom: 20px;
-}
-
-/* Sidebar Menu */
+/* ✅ Sidebar Menu Items */
 .sidebar ul {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-/* Sidebar Items */
+/* ✅ Sidebar Items */
 .sidebar ul li {
   padding: 12px;
   text-align: left;
-  display: block;
-  position: relative;
 }
 
-/* Sidebar Links */
+/* ✅ Sidebar Links (Regular Items) */
 .sidebar ul li a {
   color: white;
   text-decoration: none;
   display: block;
   width: 100%;
-  padding: 10px;
+  padding: 12px;
+  transition: background-color 0.3s ease;
 }
 
-/* ✅ Highlight Active Menu Item */
+/* ✅ Active Sidebar Item */
 .sidebar ul li a.active {
   background-color: #007bff;
   color: white;
   border-radius: 5px;
 }
 
-/* Workforce Tracker Button */
+/* ✅ Workforce Tracker (`.dropdown-btn`) Styled Exactly Like Other Items */
 .dropdown-btn {
-  background: none;
-  border: none;
-  color: white;
-  cursor: pointer;
-  font-size: 1rem;
-  width: 100%;
-  text-align: left;
-  padding: 12px;
+  all: unset; /* Remove default button styles */
   display: block;
+  width: 100%;
+  color: white;
+  padding: 12px;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/* ✅ Hover & Active Styles (Same as Sidebar Links) */
+.dropdown-btn:hover,
+.dropdown-btn.active {
+  background-color: #444; /* Matches sidebar hover effect */
+  border-radius: 5px;
+}
+.dropdown-btn.active {
+  background-color: #007bff; /* Matches active sidebar links */
+  color: white;
+  border-radius: 5px;
 }
 
 /* ✅ Workforce Tracker Dropdown Menu */
 .dropdown-menu {
-  list-style: none;
+  max-height: 250px;
+  overflow-y: auto;
   padding-left: 15px;
-  width: 100%;
-  max-height: 200px; /* ✅ Limits height */
-  overflow-y: auto; /* ✅ Enables scrolling inside dropdown */
-  scrollbar-width: thin;
-  scrollbar-color: #555 #222;
 }
 
-/* ✅ Scrollbar for Dropdown (Chrome, Safari) */
+/* ✅ Hide dropdown when collapsed */
+.dropdown-menu.hidden {
+  max-height: 0;
+  overflow: hidden;
+  display: none;
+}
+
+/* ✅ Scrollbar for Dropdown */
 .dropdown-menu::-webkit-scrollbar {
   width: 6px;
 }
-
-.dropdown-menu::-webkit-scrollbar-track {
-  background: #222;
-}
-
 .dropdown-menu::-webkit-scrollbar-thumb {
   background: #666;
   border-radius: 4px;
 }
-
 .dropdown-menu::-webkit-scrollbar-thumb:hover {
   background: #888;
 }
 
-/* Hide dropdown when collapsed */
-.dropdown-menu.hidden {
-  max-height: 0;
-  overflow: hidden;
-}
-
-/* Dropdown Items */
-.dropdown-menu li {
-  padding: 8px 10px;
-}
-
-.dropdown-menu li a {
-  color: #bbb;
-  font-size: 0.9rem;
-  display: block;
-  width: 100%;
-}
-
-.dropdown-menu li a:hover {
-  color: white;
-  background-color: #444;
-  border-radius: 5px;
+/* ✅ Responsive Sidebar Adjustments */
+@media screen and (max-width: 768px) {
+  .sidebar {
+    width: 60px !important;
+  }
+  .main-content {
+    margin-left: 60px !important;
+    width: calc(100% - 60px);
+  }
 }
