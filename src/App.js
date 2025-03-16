@@ -47,6 +47,7 @@ const App = () => {
             <Route path="/patient-education" element={<PatientEducationPage />} />
             <Route path="/ai-health-assistant" element={<AIHealthAssistantPage />} />
             <Route path="/settings" element={<SettingsPage />} />
+
             {/* Workforce Tracker Sub-Pages */}
             <Route path="/workforce/elderly-care" element={<ElderlyCarePage />} />
             <Route path="/workforce/local-healthcare" element={<LocalHealthcarePage />} />
