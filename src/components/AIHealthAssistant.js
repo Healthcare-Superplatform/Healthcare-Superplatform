@@ -3,149 +3,177 @@ import axios from 'axios';
 import '../styles/AIHealthAssistant.css';
 
 const AIHealthAssistant = () => {
-  const [ssn, setSsn] = useState(''); // SSN input
-  const [disease, setDisease] = useState(''); // Disease input
-  const [prediction, setPrediction] = useState('');
-  const [regionData, setRegionData] = useState('');
-  const [medicineData, setMedicineData] = useState(''); // Medicine data from OpenFDA
+  const [input, setInput] = useState('');
+  const [messages, setMessages] = useState([
+    { sender: 'bot', text: '🤖 Hi! How can I help you today? You can provide your SSN or ask about a disease.' }
+  ]);
 
-  // Handle the check button click
-  const handleCheck = async () => {
-    try {
-        // If no input is provided, prompt the user to enter either SSN or disease
-        if (!ssn && !disease) {
-            setPrediction('Please enter either SSN or Disease name.');
-            setRegionData('');
-            setMedicineData('');
-            return;
-        }
+  const handleUserMessage = async () => {
+    const userInput = input.trim();
+    if (!userInput) return;
 
-        // If SSN is provided, search by SSN
-        if (ssn) {
-            const ssnTrimmed = ssn.trim();
-            console.log("Entered SSN:", ssnTrimmed);
+    setMessages(prev => [...prev, { sender: 'user', text: userInput }]);
+    const botResponse = { sender: 'bot', text: '' };
 
-            const response = await axios.get(`http://localhost:5001/own_medical?ssn=${ssnTrimmed}`);
-            const ownMedicalData = response.data;
+    const ssnMatch = userInput.match(/\b\d{3}-\d{2}-\d{4}\b|\b\d{1,9}\b/);
+    
+    if (ssnMatch) {
+      const ssn = ssnMatch[0];
+      console.log("🔍 Detected SSN:", ssn);
 
-            if (ownMedicalData.length === 0) {
-                setPrediction('No data found for the given SSN.');
-                setRegionData('');
-            } else {
-                const matchedData = ownMedicalData[0];
-                const { Name, 'Own Medicals': ownMedicals, Link, Location } = matchedData;
-                const medicalsList = ownMedicals.split(',').map((item, index) => (
-                    <p key={index}>
-                        {index === 0 && <strong>Your Own Medical: </strong>}
-                        {item.trim()} (Visit: <a href={Link.split(',')[index].trim()} target="_blank" rel="noopener noreferrer">
-                            {Link.split(',')[index].trim()}
-                        </a>)
-                    </p>
-                ));
+      try {
+        const ownMedicalRes = await axios.get(`http://localhost:5001/own_medical?ssn=${encodeURIComponent(ssn)}`);
+        const ownMedicalData = ownMedicalRes.data;
 
-                const regionResponse = await axios.get(`http://localhost:5001/medical_list?location=${Location}`);
-                const regionData = regionResponse.data;
+        if (ownMedicalData.length === 0) {
+          setMessages(prev => [...prev, { sender: 'bot', text: "❌ No medical information found for this SSN." }]);
+        } else {
+          const { Name, 'Own Medicals': ownMedicals, Link, Location } = ownMedicalData[0];
 
-                if (regionData.length === 0) {
-                    setRegionData('No medical facilities available in your region.');
-                } else {
-                    setRegionData(
-                        <div>
-                            <h3>Others Medical in Your Region:</h3>
-                            {regionData.map((item, index) => (
-                                <div key={index}>
-                                    <p><strong>Hospital Name:</strong> {item.Hospital_Name}</p>
-                                    <p><strong>Location:</strong> {item.Location}</p>
-                                    <p><strong>Link:</strong> <a href={item.Link} target="_blank" rel="noopener noreferrer">{item.Link}</a></p>
-                                </div>
-                            ))}
-                        </div>
-                    );
-                }
+          const medicalList = ownMedicals.split(',').map(item => item.trim());
+          const linkList = Link.split(',').map(item => item.trim());
 
-                setPrediction(
-                    <div>
-                        <p><strong>Name:</strong> {Name}</p>
-                        {medicalsList}
-                        <p><strong>Location:</strong> {Location}</p>
-                    </div>
-                );
-            }
-        }
+          let medicalHistoryFormatted = '';
+          medicalList.forEach((medical, index) => {
+            const currentLink = linkList[index] || '#';
+            medicalHistoryFormatted += `- ${medical} ([Visit](${currentLink}))\n`;
+          });
 
-        // If disease is provided, search for medicines related to the disease
-        if (disease) {
-          const diseaseTrimmed = disease.trim();  // Trim disease input
-          console.log("Searching medicines for disease:", diseaseTrimmed);  // Debugging log
-        
-          try {
-            const response = await axios.get(`http://localhost:5001/search_medicine?disease=${diseaseTrimmed}`);
-            const medicineData = response.data;
-        
-            if (medicineData && medicineData.length > 0) {
-              setMedicineData(
-                <div>
-                  <h3>Medicines for {diseaseTrimmed}:</h3>
-                  {medicineData.map((item, index) => (
-                    <div key={index}>
-                      <p><strong>Medicine Name:</strong> {item.name}</p>
-                      <p><strong>Manufacturer:</strong> {item.manufacturer}</p>
-                      <p><strong>Substance Name:</strong> {item.substance_name}</p>
-                      <p><strong>Description:</strong> {item.description}</p>
-                    </div>
-                  ))}
-                </div>
-              );
-            } else {
-              setMedicineData('No medicines found for this disease.');
-            }
-          } catch (error) {
-            console.error('Error fetching data:', error);
-            setMedicineData('Error fetching data. Please try again.');
+          botResponse.text = `👤 **Name:** ${Name}\n📍 **Location:** ${Location}\n\n🩺 **Medical History:**\n${medicalHistoryFormatted}`;
+
+          const regionRes = await axios.get(`http://localhost:5001/medical_list?location=${encodeURIComponent(Location)}`);
+          const regionData = regionRes.data;
+          
+          const validFacilities = regionData.filter(facility =>
+            facility['Hospital name'] && facility['Location']
+          );
+          
+          if (validFacilities.length > 0) {
+            botResponse.text += `\n\n🏥 **Other Medical Facilities in ${Location}:**\n`;
+          
+            validFacilities.forEach((facility) => {
+              const hospitalName = facility['Hospital name'];
+              const link = facility['Link']?.trim() ? facility['Link'] : null;
+              const category = facility['Category(Public/private)']?.trim() || "Not specified";
+          
+              if (link) {
+                botResponse.text += `- **${hospitalName}** (${category}) [Visit Link](${link})\n`;
+              } else {
+                botResponse.text += `- **${hospitalName}** (${category}) (No Link Available)\n`;
+              }
+            });
+          } else {
+            botResponse.text += `\n\nℹ️ No other medical facilities found in your region.`;
           }
-        }
-        
-    } catch (error) {
-        console.error('Error fetching data:', error);
-        setPrediction('Error fetching data. Please try again.');
-        setRegionData('');
-        setMedicineData('');
-    }
-};
+          
 
+          setMessages(prev => [...prev, botResponse]);
+        }
+      } catch (error) {
+        console.error("❌ Error fetching medical data:", error);
+        setMessages(prev => [...prev, { sender: 'bot', text: "⚠️ Error fetching medical records. Please try again later." }]);
+      }
+    } else {
+      const diseaseName = extractDiseaseName(userInput);
+
+      if (diseaseName) {
+        await fetchMedicineData(diseaseName);
+      } else {
+        setMessages(prev => [...prev, { sender: 'bot', text: "ℹ️ Please specify a disease clearly." }]);
+      }
+      
+    }
+
+    setInput('');
+  };
+  const extractDiseaseName = (text) => {
+    text = text.toLowerCase().trim();
+  
+    const phrasesToRemove = [
+      "can you", "could you",
+      "may i", "can i",
+      "should i", "please",
+      "help me for", "get help for", "do you help",
+      "help me with", "help me", "help",
+      "what", "how",
+      "tell me about", "tell me",
+      "give me", "i have",
+      "recommend", "suggest",
+      "medicine for", "medicine", "medicines",
+      "drugs", "drug",
+      "for", "is", "with", "about",
+      "take", "needed", "necessary", "use",
+      "should", "must", "get"
+    ]; 
+  
+    const phrasesRegex = new RegExp(`\\b(${phrasesToRemove.join('|')})\\b`, 'gi');
+  
+    // Remove conversational phrases
+    text = text.replace(phrasesRegex, "").trim();
+  
+    // Remove words like disease, symptoms clearly
+    text = text.replace(/\b(disease|illness|symptoms?)\b/gi, "").trim();
+  
+    // Normalize spaces clearly
+    text = text.replace(/\s{2,}/g, " ").trim();
+  
+    return text.length > 0 ? text : null;
+  };
+  
+  
+  
+  
+  const fetchMedicineData = async (diseaseName) => {
+    const botResponse = { sender: 'bot', text: '' };
+    try {
+      console.log("🩺 Fetching medicines for:", diseaseName);
+      const response = await axios.get(`http://localhost:5001/search_medicine?disease=${encodeURIComponent(diseaseName)}`);
+      const medicines = response.data;
+
+      if (Array.isArray(medicines) && medicines.length > 0) {
+        botResponse.text = `💊 **Medicines for ${diseaseName}:**\n\n`;
+        medicines.forEach((item, idx) => {
+          botResponse.text += `${idx + 1}. **${item.name}**\n   - Manufacturer: ${item.manufacturer}\n   - Substance: ${item.substance_name}\n   - Description: ${item.description}\n\n`;
+        });
+      } else {
+        botResponse.text = `ℹ️ No medicines found for "${diseaseName}".`;
+      }
+
+      setMessages(prev => [...prev, botResponse]);
+    } catch (error) {
+      console.error("❌ Error fetching medicines:", error);
+      setMessages(prev => [...prev, { sender: 'bot', text: "⚠️ Error fetching medicines. Please try again later." }]);
+    }
+  };
+
+  const formatText = (text) => {
+    return text
+      .replace(/\n/g, '<br/>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\[([^\]]+)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
+  };
 
   return (
-    <>
-      <div className="ai-health-assistant">
-        <h2>🤖 AI Health Assistant</h2>
-        <div className="symptom-checker">
-          <label>Enter Your SSN:</label>
-          <input
-            type="text"
-            value={ssn}
-            onChange={(e) => setSsn(e.target.value)}
-            placeholder="Enter SSN"
-          />
-          <label>Or Enter a Disease Name:</label>
-          <input
-            type="text"
-            value={disease}
-            onChange={(e) => setDisease(e.target.value)}
-            placeholder="Enter Disease"
-          />
-          <button onClick={handleCheck}>Check</button>
-        </div>
-        <div className="prediction">
-          {prediction}
-        </div>
-        <div className="region-data">
-          {regionData}
-        </div>
-        <div className="medicine-data">
-          {medicineData}
-        </div>
+    <div className="ai-health-assistant">
+      <h2>🤖 AI Health Assistant Chat</h2>
+      <div className="chatbox">
+        {messages.map((msg, idx) => (
+          <div key={idx} className={`chat-message ${msg.sender}`}>
+            <p dangerouslySetInnerHTML={{ __html: formatText(msg.text) }}></p>
+          </div>
+        ))}
       </div>
-    </>
+      <div className="chat-input">
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Type your message..."
+          onKeyDown={(e) => e.key === 'Enter' && handleUserMessage()}
+        />
+        <button onClick={handleUserMessage}>Send</button>
+      </div>
+    </div>
   );
 };
 
