@@ -155,7 +155,7 @@ const AIHealthAssistant = () => {
 
   return (
     <div className="ai-health-assistant">
-      <h2>🤖 AI Health Assistant Chat</h2>
+      <h2>🤖 AI Health Assistant Chatbot</h2>
       <div className="chatbox">
         {messages.map((msg, idx) => (
           <div key={idx} className={`chat-message ${msg.sender}`}>
