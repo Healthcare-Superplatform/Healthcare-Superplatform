@@ -89,36 +89,33 @@ const AIHealthAssistant = () => {
   const extractDiseaseName = (text) => {
     text = text.toLowerCase().trim();
   
+    // Comprehensive removal of unnecessary words and phrases
     const phrasesToRemove = [
-      "can you", "could you",
-      "may i", "can i",
-      "should i", "please",
+      "can you", "could you", "may i", "can i", "should i", "please",
       "help me for", "get help for", "do you help",
       "help me with", "help me", "help",
-      "what", "how",
-      "tell me about", "tell me",
-      "give me", "i have",
-      "recommend", "suggest",
-      "medicine for", "medicine", "medicines",
-      "drugs", "drug",
-      "for", "is", "with", "about",
-      "take", "needed", "necessary", "use",
+      "what medicine should i take", "what medicine is necessary",
+      "what medicine should i take", "medicine is necessary", "medicine necessary",
+      "medicine for", "medicine is necessary", "medicine should i take",
+      "what medicine", "which medicine",
+      "what", "how", "tell me about", "tell me",
+      "give me", "i have", "recommend", "suggest",
+      "medicine", "medicines", "drugs", "drug",
+      "for", "is", "with", "about", "take", "needed", "necessary", "use",
       "should", "must", "get"
-    ]; 
+    ];
   
-    const phrasesRegex = new RegExp(`\\b(${phrasesToRemove.join('|')})\\b`, 'gi');
+    phrasesToRemove.forEach(phrase => {
+      const regex = new RegExp(`\\b${phrase}\\b`, 'gi');
+      text = text.replace(regex, '');
+    });
   
-    // Remove conversational phrases
-    text = text.replace(phrasesRegex, "").trim();
-  
-    // Remove words like disease, symptoms clearly
-    text = text.replace(/\b(disease|illness|symptoms?)\b/gi, "").trim();
-  
-    // Normalize spaces clearly
+    // Clean up extra whitespace
     text = text.replace(/\s{2,}/g, " ").trim();
   
-    return text.length > 0 ? text : null;
+    return text.length > 2 ? text : null;
   };
+  
   
   
   
