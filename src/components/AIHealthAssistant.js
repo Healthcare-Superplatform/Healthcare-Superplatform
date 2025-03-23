@@ -128,6 +128,24 @@ const AIHealthAssistant = () => {
         message += `- ${m} (<a href="${linkList[i] || '#'}" target="_blank">Visit</a>)<br/>`;
       });
 
+         // 🔁 Fetch regional hospitals using /medical_list
+    const regionRes = await axios.get(`http://localhost:5001/medical_list?location=${encodeURIComponent(Location)}`);
+    const regionHospitals = regionRes.data;
+
+    if (regionHospitals.length > 0) {
+      message += `<br/><strong>🏥 Other Medical Facilities in ${Location}:</strong><br/>`;
+
+      regionHospitals.forEach((facility) => {
+        const name = facility['Hospital name'];
+        const category = facility['Category(Public/private)'] || 'Unknown';
+        const link = facility['Link']?.trim() || 'Unknown';
+
+        if (name) {
+          message += `- <strong>${name}</strong> (${category})`;
+          message += link ? ` <a href="${link}" target="_blank">Visit</a><br/>` : `<br/>`;
+        }
+      });
+    }
       setMessages(prev => [...prev, { sender: 'bot', type: 'text', text: message }]);
     } catch (error) {
       console.error('❌ Error fetching SSN data:', error);
