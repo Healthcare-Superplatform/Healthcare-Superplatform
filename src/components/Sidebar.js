@@ -94,6 +94,7 @@ const Sidebar = () => {
         </li>
 
         <li><Link to="/ai-health-assistant">🤖 AI Health Assistant</Link></li>
+        <li><Link to="/symptom-checker">🤖 Symptom Checker</Link></li>
         <li><Link to="/settings">⚙️ Settings</Link></li>
       </ul>
     </nav>

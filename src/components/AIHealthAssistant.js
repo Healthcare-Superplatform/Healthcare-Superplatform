@@ -1,145 +1,137 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import SymptomChecker from './SymptomChecker';
 import '../styles/AIHealthAssistant.css';
 
 const AIHealthAssistant = () => {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState([
-    { sender: 'bot', text: '🤖 Hi! How can I help you today? You can provide your SSN or ask about a disease.' }
+    {
+      sender: 'bot',
+      type: 'text',
+      text: `<div style="text-align: center;">🤖 <strong>Hi! How can I help you today?</strong></div><br/>
+      <span style="color:#2c3e50;"><strong>Now I am available for the following services:</strong></span><br/><br/>
+      ➤ <strong><span style="color:#16a085;">Enter your SSN</span></strong> to get <strong>Healthcare & Hospital Info</strong><br/>
+      ➤ <strong><span style="color:#2980b9;">Type "Check symptoms"</span></strong> to access the <strong>Symptom Checker</strong><br/>
+      ➤ <strong><span style="color:#8e44ad;">Ask about a disease</span></strong> or just provide a <strong>keyword</strong> to get <strong>medicine suggestions</strong>`
+    }
+    
+    
+    
   ]);
 
   const handleUserMessage = async () => {
     const userInput = input.trim();
     if (!userInput) return;
 
-    setMessages(prev => [...prev, { sender: 'user', text: userInput }]);
-    const botResponse = { sender: 'bot', text: '' };
+    setMessages(prev => [...prev, { sender: 'user', type: 'text', text: userInput }]);
+    setInput('');
 
-    const ssnMatch = userInput.match(/\b\d{3}-\d{2}-\d{4}\b|\b\d{1,9}\b/);
-    
-    if (ssnMatch) {
-      const ssn = ssnMatch[0];
-      console.log("🔍 Detected SSN:", ssn);
+    const lowerInput = userInput.toLowerCase();
 
-      try {
-        const ownMedicalRes = await axios.get(`http://localhost:5001/own_medical?ssn=${encodeURIComponent(ssn)}`);
-        const ownMedicalData = ownMedicalRes.data;
-
-        if (ownMedicalData.length === 0) {
-          setMessages(prev => [...prev, { sender: 'bot', text: "❌ No medical information found for this SSN." }]);
-        } else {
-          const { Name, 'Own Medicals': ownMedicals, Link, Location } = ownMedicalData[0];
-
-          const medicalList = ownMedicals.split(',').map(item => item.trim());
-          const linkList = Link.split(',').map(item => item.trim());
-
-          let medicalHistoryFormatted = '';
-          medicalList.forEach((medical, index) => {
-            const currentLink = linkList[index] || '#';
-            medicalHistoryFormatted += `- ${medical} ([Visit](${currentLink}))\n`;
-          });
-
-          botResponse.text = `👤 **Name:** ${Name}\n📍 **Location:** ${Location}\n\n🩺 **Medical History:**\n${medicalHistoryFormatted}`;
-
-          const regionRes = await axios.get(`http://localhost:5001/medical_list?location=${encodeURIComponent(Location)}`);
-          const regionData = regionRes.data;
-          
-          const validFacilities = regionData.filter(facility =>
-            facility['Hospital name'] && facility['Location']
-          );
-          
-          if (validFacilities.length > 0) {
-            botResponse.text += `\n\n🏥 **Other Medical Facilities in ${Location}:**\n`;
-          
-            validFacilities.forEach((facility) => {
-              const hospitalName = facility['Hospital name'];
-              const link = facility['Link']?.trim() ? facility['Link'] : null;
-              const category = facility['Category(Public/private)']?.trim() || "Not specified";
-          
-              if (link) {
-                botResponse.text += `- **${hospitalName}** (${category}) [Visit Link](${link})\n`;
-              } else {
-                botResponse.text += `- **${hospitalName}** (${category}) (No Link Available)\n`;
-              }
-            });
-          } else {
-            botResponse.text += `\n\nℹ️ No other medical facilities found in your region.`;
-          }
-          
-
-          setMessages(prev => [...prev, botResponse]);
-        }
-      } catch (error) {
-        console.error("❌ Error fetching medical data:", error);
-        setMessages(prev => [...prev, { sender: 'bot', text: "⚠️ Error fetching medical records. Please try again later." }]);
-      }
-    } else {
-      const diseaseName = extractDiseaseName(userInput);
-
-      if (diseaseName) {
-        await fetchMedicineData(diseaseName);
-      } else {
-        setMessages(prev => [...prev, { sender: 'bot', text: "ℹ️ Please specify a disease clearly." }]);
-      }
-      
+    // Check if user wants to open Symptom Checker
+    if (lowerInput.includes('symptom') || lowerInput.includes('check symptoms') || lowerInput.includes('open symptom checker')) {
+      setMessages(prev => [
+        ...prev,
+        { sender: 'bot', type: 'text', text: '🩺 Opening Symptom Checker...' },
+        { sender: 'bot', type: 'component', component: 'symptomChecker' }
+      ]);
+      return;
     }
 
-    setInput('');
+    // Check for SSN
+    const ssnMatch = userInput.match(/\b\d{3}-\d{2}-\d{4}\b|\b\d{1,9}\b/);
+    if (ssnMatch) {
+      await fetchSSNData(ssnMatch[0]);
+      return;
+    }
+
+    // Handle disease-based medicine request
+    const diseaseName = extractDiseaseName(userInput);
+    console.log('🧪 Extracted disease name:', diseaseName);
+    if (diseaseName) {
+      await fetchMedicineData(diseaseName);
+    } else {
+      setMessages(prev => [...prev, { sender: 'bot', type: 'text', text: 'ℹ️ Please specify a disease clearly.' }]);
+    }
   };
+
   const extractDiseaseName = (text) => {
+    if (!text) return null;
+
     text = text.toLowerCase().trim();
-  
-    // Comprehensive removal of unnecessary words and phrases
+
     const phrasesToRemove = [
-      "can you", "could you", "may i", "can i", "should i", "please",
-      "help me for", "get help for", "do you help",
-      "help me with", "help me", "help",
-      "what medicine should i take", "what medicine is necessary",
-      "what medicine should i take", "medicine is necessary", "medicine necessary",
-      "medicine for", "medicine is necessary", "medicine should i take",
-      "what medicine", "which medicine",
-      "what", "how", "tell me about", "tell me",
-      "give me", "i have", "recommend", "suggest",
-      "medicine", "medicines", "drugs", "drug",
-      "for", "is", "with", "about", "take", "needed", "necessary", "use",
-      "should", "must", "get"
+      'can you', 'could you', 'may i', 'should i', 'please', 'help me with', 'help me for', 'help me', 'help',
+      'get help for', 'what medicine', 'which medicine', 'what should i take', 'what can i take',
+      'how to treat', 'give me', 'i have', 'recommend', 'suggest', 'for', 'is', 'with', 'about', 'take', 'needed',
+      'necessary', 'use', 'must', 'get', 'medicine', 'medicines', 'drugs', 'drug'
     ];
-  
+
     phrasesToRemove.forEach(phrase => {
       const regex = new RegExp(`\\b${phrase}\\b`, 'gi');
       text = text.replace(regex, '');
     });
-  
-    // Clean up extra whitespace
-    text = text.replace(/\s{2,}/g, " ").trim();
-  
+
+    text = text.replace(/[^\w\s]/gi, '').replace(/\s{2,}/g, ' ').trim();
+
     return text.length > 2 ? text : null;
   };
-  
-  
-  
-  
-  
-  const fetchMedicineData = async (diseaseName) => {
-    const botResponse = { sender: 'bot', text: '' };
-    try {
-      console.log("🩺 Fetching medicines for:", diseaseName);
-      const response = await axios.get(`http://localhost:5001/search_medicine?disease=${encodeURIComponent(diseaseName)}`);
-      const medicines = response.data;
 
-      if (Array.isArray(medicines) && medicines.length > 0) {
-        botResponse.text = `💊 **Medicines for ${diseaseName}:**\n\n`;
-        medicines.forEach((item, idx) => {
-          botResponse.text += `${idx + 1}. **${item.name}**\n   - Manufacturer: ${item.manufacturer}\n   - Substance: ${item.substance_name}\n   - Description: ${item.description}\n\n`;
-        });
-      } else {
-        botResponse.text = `ℹ️ No medicines found for "${diseaseName}".`;
+  const fetchMedicineData = async (diseaseName) => {
+    try {
+      const res = await axios.get(`http://localhost:5001/search_medicine?disease=${encodeURIComponent(diseaseName)}`);
+      const medicines = res.data;
+
+      if (!Array.isArray(medicines) || medicines.length === 0) {
+        setMessages(prev => [...prev, { sender: 'bot', type: 'text', text: `ℹ️ No medicines found for "${diseaseName}".` }]);
+        return;
       }
 
-      setMessages(prev => [...prev, botResponse]);
+      const limitWords = (str, maxWords = 20) => {
+        const words = str.split(' ');
+        return words.slice(0, maxWords).join(' ') + (words.length > maxWords ? '...' : '');
+      };
+
+      let text = `💊 <strong>Medicines for ${diseaseName}:</strong><br/><br/>`;
+      medicines.forEach((med, index) => {
+        text += `${index + 1}. <strong>${med.name}</strong><br/>`;
+        text += `- Manufacturer: ${med.manufacturer}<br/>`;
+        text += `- Substance: ${med.substance_name}<br/>`;
+        text += `- Description: ${limitWords(med.description)}<br/><br/>`;
+      });
+
+      setMessages(prev => [...prev, { sender: 'bot', type: 'text', text }]);
     } catch (error) {
-      console.error("❌ Error fetching medicines:", error);
-      setMessages(prev => [...prev, { sender: 'bot', text: "⚠️ Error fetching medicines. Please try again later." }]);
+      console.error('❌ Error fetching medicines:', error);
+      setMessages(prev => [...prev, { sender: 'bot', type: 'text', text: '⚠️ Error fetching medicines. Please try again later.' }]);
+    }
+  };
+
+  const fetchSSNData = async (ssn) => {
+    try {
+      const res = await axios.get(`http://localhost:5001/own_medical?ssn=${encodeURIComponent(ssn)}`);
+      const data = res.data;
+
+      if (!data || data.length === 0) {
+        setMessages(prev => [...prev, { sender: 'bot', type: 'text', text: '❌ No medical information found for this SSN.' }]);
+        return;
+      }
+
+      const { Name, 'Own Medicals': ownMedicals, Link, Location } = data[0];
+
+      const medicalList = ownMedicals.split(',').map(item => item.trim());
+      const linkList = Link.split(',').map(item => item.trim());
+
+      let message = `👤 <strong>Name:</strong> ${Name}<br/>📍 <strong>Location:</strong> ${Location}<br/><br/><strong>🩺 Medical History:</strong><br/>`;
+      medicalList.forEach((m, i) => {
+        message += `- ${m} (<a href="${linkList[i] || '#'}" target="_blank">Visit</a>)<br/>`;
+      });
+
+      setMessages(prev => [...prev, { sender: 'bot', type: 'text', text: message }]);
+    } catch (error) {
+      console.error('❌ Error fetching SSN data:', error);
+      setMessages(prev => [...prev, { sender: 'bot', type: 'text', text: '⚠️ Error fetching medical records. Please try again later.' }]);
     }
   };
 
@@ -156,7 +148,11 @@ const AIHealthAssistant = () => {
       <div className="chatbox">
         {messages.map((msg, idx) => (
           <div key={idx} className={`chat-message ${msg.sender}`}>
-            <p dangerouslySetInnerHTML={{ __html: formatText(msg.text) }}></p>
+            {msg.type === 'text' ? (
+              <p dangerouslySetInnerHTML={{ __html: formatText(msg.text) }} />
+            ) : msg.type === 'component' && msg.component === 'symptomChecker' ? (
+              <SymptomChecker />
+            ) : null}
           </div>
         ))}
       </div>

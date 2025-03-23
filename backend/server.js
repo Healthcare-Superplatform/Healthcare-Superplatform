@@ -6,6 +6,7 @@ const User = require('./models/User');
 const MedicalList = require('./models/MedicalList');
 const OwnMedical = require('./models/OwnMedical');
 
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -86,6 +87,12 @@ app.get('/own_medical', async (req, res) => {
     }
 });
 
+// Fetch routes for symtom checker
+
+const mockApi = require("./mockApiRoutes"); 
+
+console.log("🚀 Setting up mock API routes...");
+app.use("/api", mockApi);
 
 
 // ✅ Search for medicines related to a disease from OpenFDA
