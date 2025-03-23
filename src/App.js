@@ -11,6 +11,7 @@ import WorkforcePage from './pages/WorkforcePage';
 import JobPortalPage from './pages/JobPortalPage';
 import PatientEducationPage from './pages/PatientEducationPage';
 import AIHealthAssistantPage from './pages/AIHealthAssistantPage';
+import SymptomCheckerPage from './pages/SymtomCheckerPage';
 import SettingsPage from './pages/SettingsPage';
 import ElderlyCarePage from './pages/workforce/ElderlyCarePage';
 import LocalHealthcarePage from './pages/workforce/LocalHealthcarePage';
@@ -25,6 +26,7 @@ import HomeBasedCarePage from './pages/workforce/HomeBasedCarePage';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import './styles/App.css';
+
 
 const App = () => {
   return (
@@ -46,6 +48,7 @@ const App = () => {
             <Route path="/job-portal" element={<JobPortalPage />} />
             <Route path="/patient-education" element={<PatientEducationPage />} />
             <Route path="/ai-health-assistant" element={<AIHealthAssistantPage />} />
+            <Route path="/symptom-checker" element={<SymptomCheckerPage />} />
             <Route path="/settings" element={<SettingsPage />} />
 
             {/* Workforce Tracker Sub-Pages */}
