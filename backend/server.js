@@ -12,7 +12,8 @@ app.use(cors());
 app.use(express.json());
 
 // Connect to MongoDB
-mongoose.connect('mongodb://127.0.0.1:27017/superplatform-backend', {
+// Connect to MongoDB Atlas
+mongoose.connect('mongodb+srv://pankajchakrabarty22:P%40nkaj2025@superplatform-backend.u6aoy.mongodb.net/superplatform-backend?retryWrites=true&w=majority&appName=superplatform-backend', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
@@ -23,6 +24,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/superplatform-backend', {
 .catch((err) => {
   console.error('❌ Error connecting to MongoDB:', err);
 });
+
 
 // ✅ Health Check Endpoint
 app.get('/health', (req, res) => {
