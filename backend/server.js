@@ -5,11 +5,19 @@ const axios = require('axios'); // Import axios for making HTTP requests to Open
 const User = require('./models/User');
 const MedicalList = require('./models/MedicalList');
 const OwnMedical = require('./models/OwnMedical');
+const feedbackRoutes = require('./routes/feedback');
 
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000',
+  methods: ['GET', 'POST'],
+  credentials: true
+}));
 app.use(express.json());
+
+// Feedback routes
+app.use('/api/feedback', feedbackRoutes);
 
 // Connect to MongoDB
 // Connect to MongoDB Atlas

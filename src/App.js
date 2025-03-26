@@ -26,6 +26,7 @@ import HomeBasedCarePage from './pages/workforce/HomeBasedCarePage';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import './styles/App.css';
+import Feedback from './components/Feedback';
 
 
 const App = () => {
@@ -38,6 +39,7 @@ const App = () => {
              <Route path="/" element={<Login />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/feedback" element={<Feedback />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/appointments" element={<AppointmentsPage />} />
             <Route path="/health-status" element={<HealthStatusPage />} /> 

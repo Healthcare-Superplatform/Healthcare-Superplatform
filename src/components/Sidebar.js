@@ -71,6 +71,7 @@ const Sidebar = () => {
         <li><Link to="/lifestyle-insights" onClick={(e) => handleMenuItemClick(e, '/lifestyle-insights')} className={activeItem === '/lifestyle-insights' ? 'active' : ''}>💡 Lifestyle Insights</Link></li>
         <li><Link to="/job-portal" onClick={(e) => handleMenuItemClick(e, '/job-portal')} className={activeItem === '/job-portal' ? 'active' : ''}>💼 Healthcare Jobs</Link></li>
         <li><Link to="/patient-education" onClick={(e) => handleMenuItemClick(e, '/patient-education')} className={activeItem === '/patient-education' ? 'active' : ''}>📚 Patient Education</Link></li>
+        <li><Link to="/feedback" onClick={(e) => handleMenuItemClick(e, '/feedback')} className={activeItem === '/feedback' ? 'active' : ''}>⭐ Rate Assistant</Link></li>
 
         {/* ✅ Workforce Tracker Dropdown */}
         <li>
