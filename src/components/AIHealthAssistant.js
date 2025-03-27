@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import SymptomChecker from './SymptomChecker';
+import Feedback from './Feedback';
 import '../styles/AIHealthAssistant.css';
 
 const AIHealthAssistant = () => {
@@ -15,10 +16,8 @@ const AIHealthAssistant = () => {
       ➤ <strong><span style="color:#2980b9;">Type "Check symptoms"</span></strong> to access the <strong>Symptom Checker</strong><br/>
       ➤ <strong><span style="color:#8e44ad;">Ask about a disease</span></strong> or just provide a <strong>keyword</strong> to get <strong>medicine suggestions</strong>`
     }
-    
-    
-    
   ]);
+  const [showFeedbackOnly, setShowFeedbackOnly] = useState(false);
 
   const handleUserMessage = async () => {
     const userInput = input.trim();
@@ -29,8 +28,11 @@ const AIHealthAssistant = () => {
 
     const lowerInput = userInput.toLowerCase();
 
-    // Check if user wants to open Symptom Checker
-    if (lowerInput.includes('symptom') || lowerInput.includes('check symptoms') || lowerInput.includes('open symptom checker')) {
+    if (
+      lowerInput.includes('symptom') ||
+      lowerInput.includes('check symptoms') ||
+      lowerInput.includes('open symptom checker')
+    ) {
       setMessages(prev => [
         ...prev,
         { sender: 'bot', type: 'text', text: '🩺 Opening Symptom Checker...' },
@@ -39,16 +41,13 @@ const AIHealthAssistant = () => {
       return;
     }
 
-    // Check for SSN
     const ssnMatch = userInput.match(/\b\d{3}-\d{2}-\d{4}\b|\b\d{1,9}\b/);
     if (ssnMatch) {
       await fetchSSNData(ssnMatch[0]);
       return;
     }
 
-    // Handle disease-based medicine request
     const diseaseName = extractDiseaseName(userInput);
-    console.log('🧪 Extracted disease name:', diseaseName);
     if (diseaseName) {
       await fetchMedicineData(diseaseName);
     } else {
@@ -58,23 +57,18 @@ const AIHealthAssistant = () => {
 
   const extractDiseaseName = (text) => {
     if (!text) return null;
-
     text = text.toLowerCase().trim();
-
     const phrasesToRemove = [
       'can you', 'could you', 'may i', 'should i', 'please', 'help me with', 'help me for', 'help me', 'help',
       'get help for', 'what medicine', 'which medicine', 'what should i take', 'what can i take',
       'how to treat', 'give me', 'i have', 'recommend', 'suggest', 'for', 'is', 'with', 'about', 'take', 'needed',
       'necessary', 'use', 'must', 'get', 'medicine', 'medicines', 'drugs', 'drug'
     ];
-
     phrasesToRemove.forEach(phrase => {
       const regex = new RegExp(`\\b${phrase}\\b`, 'gi');
       text = text.replace(regex, '');
     });
-
     text = text.replace(/[^\w\s]/gi, '').replace(/\s{2,}/g, ' ').trim();
-
     return text.length > 2 ? text : null;
   };
 
@@ -107,58 +101,71 @@ const AIHealthAssistant = () => {
       setMessages(prev => [...prev, { sender: 'bot', type: 'text', text: '⚠️ Error fetching medicines. Please try again later.' }]);
     }
   };
-
   const fetchSSNData = async (ssn) => {
     try {
       const res = await axios.get(`http://localhost:5001/own_medical?ssn=${encodeURIComponent(ssn)}`);
       const data = res.data;
-
+  
       if (!data || data.length === 0) {
         setMessages(prev => [...prev, { sender: 'bot', type: 'text', text: '❌ No medical information found for this SSN.' }]);
         return;
       }
-
+  
       const { Name, 'Own Medicals': ownMedicals, Link, Location } = data[0];
-
       const medicalList = ownMedicals.split(',').map(item => item.trim());
       const linkList = Link.split(',').map(item => item.trim());
-
+  
       let message = `👤 <strong>Name:</strong> ${Name}<br/>📍 <strong>Location:</strong> ${Location}<br/><br/><strong>🩺 Medical History:</strong><br/>`;
       medicalList.forEach((m, i) => {
         message += `- ${m} (<a href="${linkList[i] || '#'}" target="_blank">Visit</a>)<br/>`;
       });
-
-         // 🔁 Fetch regional hospitals using /medical_list
-    const regionRes = await axios.get(`http://localhost:5001/medical_list?location=${encodeURIComponent(Location)}`);
-    const regionHospitals = regionRes.data;
-
-    if (regionHospitals.length > 0) {
-      message += `<br/><strong>🏥 Other Medical Facilities in ${Location}:</strong><br/>`;
-
-      regionHospitals.forEach((facility) => {
-        const name = facility['Hospital name'];
-        const category = facility['Category(Public/private)'] || 'Unknown';
-        const link = facility['Link']?.trim() || 'Unknown';
-
-        if (name) {
-          message += `- <strong>${name}</strong> (${category})`;
-          message += link ? ` <a href="${link}" target="_blank">Visit</a><br/>` : `<br/>`;
-        }
-      });
-    }
+  
+      // 🔁 Fetch regional hospitals using /medical_list
+      const regionRes = await axios.get(`http://localhost:5001/medical_list?location=${encodeURIComponent(Location)}`);
+      const regionHospitals = regionRes.data;
+  
+      if (regionHospitals.length > 0) {
+        message += `<br/><strong>🏥 Other Medical Facilities in ${Location}:</strong><br/>`;
+  
+        regionHospitals.forEach((facility) => {
+          const name = facility['Hospital name'];
+          const category = facility['Category(Public/private)'] || 'Unknown';
+          const link = facility['Link']?.trim() || 'Unknown';
+  
+          if (name) {
+            message += `- <strong>${name}</strong> (${category})`;
+            message += link ? ` <a href="${link}" target="_blank">Visit</a><br/>` : `<br/>`;
+          }
+        });
+      }
+  
       setMessages(prev => [...prev, { sender: 'bot', type: 'text', text: message }]);
     } catch (error) {
       console.error('❌ Error fetching SSN data:', error);
       setMessages(prev => [...prev, { sender: 'bot', type: 'text', text: '⚠️ Error fetching medical records. Please try again later.' }]);
     }
   };
-
+  
   const formatText = (text) => {
     return text
       .replace(/\n/g, '<br/>')
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\[([^\]]+)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
   };
+
+  // 🧠 If feedback is open, show feedback form only
+  if (showFeedbackOnly) {
+    return (
+      <div className="ai-health-feedback-view">
+        <Feedback />
+        <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+          <button onClick={() => setShowFeedbackOnly(false)} style={{ padding: '8px 16px' }}>
+            ← Back to Chatbot
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="ai-health-assistant">
@@ -174,6 +181,7 @@ const AIHealthAssistant = () => {
           </div>
         ))}
       </div>
+
       <div className="chat-input">
         <input
           type="text"
@@ -184,6 +192,14 @@ const AIHealthAssistant = () => {
         />
         <button onClick={handleUserMessage}>Send</button>
       </div>
+
+      {/* Full window feedback toggle */}
+      <button
+        className="feedback-fullscreen-toggle"
+        onClick={() => setShowFeedbackOnly(true)}
+      >
+        ⭐ Rate Assistant
+      </button>
     </div>
   );
 };
