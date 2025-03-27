@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import './Feedback.css';
+import '../styles/Feedback.css';
 
 const Feedback = () => {
   const [feedback, setFeedback] = useState('');
