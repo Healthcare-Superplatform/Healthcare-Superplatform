@@ -1,0 +1,50 @@
+[
+  {
+    "SSN": "1",
+    "BMI": 29.4,
+    "HeartRate_BPM": 72,
+    "BloodPressure_mmHg": "120/80",
+    "OxygenSaturation_SpO2": 98,
+    "DailySteps": 5000,
+    "SleepHours": 6,
+    "Medication": ["Vitamin D", "Probiotics"],
+    "HealthGoals": {
+      "WeightGoal_kg": 85,
+      "DailyStepGoal": 8000,
+      "SleepGoal_Hours": 7
+    },
+    "LastUpdated": "2025-03-27"
+  },
+  {
+    "SSN": "2",
+    "BMI": 20.0,
+    "HeartRate_BPM": 68,
+    "BloodPressure_mmHg": "110/70",
+    "OxygenSaturation_SpO2": 99,
+    "DailySteps": 8500,
+    "SleepHours": 8,
+    "Medication": [],
+    "HealthGoals": {
+      "WeightGoal_kg": 53,
+      "DailyStepGoal": 10000,
+      "SleepGoal_Hours": 8
+    },
+    "LastUpdated": "2025-03-27"
+  },
+  {
+    "SSN": "3",
+    "BMI": 22.5,
+    "HeartRate_BPM": 75,
+    "BloodPressure_mmHg": "115/75",
+    "OxygenSaturation_SpO2": 97,
+    "DailySteps": 6000,
+    "SleepHours": 7,
+    "Medication": ["Antihistamine"],
+    "HealthGoals": {
+      "WeightGoal_kg": 60,
+      "DailyStepGoal": 7000,
+      "SleepGoal_Hours": 7.5
+    },
+    "LastUpdated": "2025-03-27"
+  }
+]
