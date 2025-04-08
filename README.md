@@ -1,70 +1,151 @@
-# Getting Started with Create React App
+# Healthcare-Superplatform (Yiming Branch)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This branch enhances the platform with medical record archiving, categorization, and personalized health recommendations functionality.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+### Core Features
+- 🗃️ **Medical Record Archiving System**  
+  Enables the archiving of medical records for easy retrieval and management.
+  
+- 🏷️ **Automatic Record Categorization**  
+  Categorizes records into predefined types such as lab results, vital signs, prescriptions, and more.
+  
+- 💡 **AI-Powered Health Recommendations**  
+  Provides personalized health recommendations based on medical data and patterns.
+  
+- 🔍 **Integrated with Existing AI Assistant**  
+  Enhances the AI assistant with the ability to manage medical records and provide health-related advice.
+  
+- 🚨 **Proactive Health Monitoring Alerts**  
+  Sends alerts for overdue checkups, abnormal results, and other health concerns.
 
-### `npm start`
+## Setup
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### Prerequisites
+To set up the project, make sure you have the following:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- Node.js (v16 or higher)
+- MongoDB Atlas account or local MongoDB instance
+- Git
+- VS Code (recommended)
 
-### `npm test`
+### Installation
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+1. Clone the repository and install dependencies:
+    ```bash
+    git clone https://github.com/Healthcare-Superplatform/Healthcare-Superplatform.git
+    cd Healthcare-Superplatform
+    git checkout yiming
+    npm install
+    ```
 
-### `npm run build`
+2. **Configure the environment:**
+    Create a `.env` file in the root directory with the following content:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+    ```env
+    MONGODB_URI=mongodb+srv://<username>:<password>@your-cluster.mongodb.net/superplatform-backend?retryWrites=true&w=majority
+    PORT=5001
+    ```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+3. **Seed sample data:**
+    To seed the sample medical records, run:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+    ```bash
+    node seedMedicalRecords.js
+    ```
 
-### `npm run eject`
+    Expected output: 
+    ```
+    Sample medical records seeded successfully!
+    ```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Running the Application
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+1. **Start the Backend Server:**
+    ```bash
+    node server.js
+    ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+2. **Start the Frontend (in a separate terminal):**
+    ```bash
+    npm start
+    ```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+3. **Access URLs:**
 
-## Learn More
+    - Frontend: [http://localhost:3000](http://localhost:3000)
+    - Backend API: [http://localhost:5001](http://localhost:5001)
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Testing
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### 1. Medical Records Interface
+Navigate to: [http://localhost:3000/medical-records](http://localhost:3000/medical-records)
 
-### Code Splitting
+- Verify categorized records (Lab Results, Vital Signs, etc.)
+- Test the archiving functionality using the "Archive" button.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### 2. Health Recommendations
+Check the "Health Recommendations" section. Recommendations will appear based on:
 
-### Analyzing the Bundle Size
+1. Abnormal test results
+2. Due vaccinations
+3. Annual checkup reminders
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### 3. AI Assistant Integration
+Open: [http://localhost:3000/ai-health-assistant](http://localhost:3000/ai-health-assistant)
 
-### Making a Progressive Web App
+Try the following test commands:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+- `show records`
+- `What vaccinations do I need?`
+- `Do I have any abnormal test results?`
+- `When was my last checkup?`
 
-### Advanced Configuration
+### 4. API Endpoint Testing
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+- **Get Categorized Records:**
+    ```bash
+    curl http://localhost:5001/api/records/101
+    ```
 
-### Deployment
+- **Archive a Record (replace :id with actual record ID):**
+    ```bash
+    curl -X PATCH http://localhost:5001/api/records/:id/archive
+    ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+- **Get Recommendations:**
+    ```bash
+    curl http://localhost:5001/api/recommendations/101
+    ```
 
-### `npm run build` fails to minify
+### Test Data
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Two test users are available:
+
+#### User 101
+- Elevated blood pressure (138/88)
+- Overdue flu shot (last October 2022)
+- Normal blood work
+
+#### User 102
+- High cholesterol (LDL 140)
+- Recent annual checkup (January 2023)
+
+## Troubleshooting
+
+| **Issue**                           | **Solution**                                                       |
+|-------------------------------------|--------------------------------------------------------------------|
+| **MongoDB connection errors**       | Verify connection string in `.env`                                 |
+| **No recommendations appearing**    | Ensure sample data was seeded correctly                           |
+| **AI command issues**               | Check network requests in browser dev tools for errors            |
+
+## Development Notes
+
+### Key Architecture:
+- **Medical records** are stored in the `medical_records` collection.
+- **Archived records** use the `isArchived: true` flag.
+- **Recommendation engine** triggers based on:
+  1. Abnormal value detection (e.g., abnormal lab results)
+  2. Temporal patterns (e.g., overdue checkups, vaccinations)
+  3. Clinical guideline compliance (e.g., reminder for annual checkup)
