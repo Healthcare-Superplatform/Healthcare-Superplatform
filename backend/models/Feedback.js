@@ -5,6 +5,17 @@ const feedbackSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  rating: {
+    type: Number,
+    required: true,
+    min: 1,
+    max: 5
+  },
+  category: {
+    type: String,
+    required: true,
+    enum: ['Very Bad', 'Bad', 'Good', 'Very Good', 'Best']
+  },
   timestamp: {
     type: Date,
     default: Date.now,

@@ -5,16 +5,45 @@ const Feedback = require('../models/Feedback');
 // POST route to save feedback
 router.post('/', async (req, res) => {
   try {
-    console.log('Received feedback request:', req.body);
-    const { feedback } = req.body;
+    console.log('Received feedback request:', JSON.stringify(req.body, null, 2));
+    const { feedback, rating, category } = req.body;
     
+    console.log('Parsed values:', {
+      feedback: typeof feedback,
+      rating: typeof rating,
+      category: typeof category,
+      ratingValue: rating,
+      categoryValue: category
+    });
+
     if (!feedback || !feedback.trim()) {
       console.log('Empty feedback received');
       return res.status(400).json({ message: 'Feedback cannot be empty' });
     }
 
+    if (!rating || rating < 1 || rating > 5) {
+      console.log('Invalid rating received:', rating);
+      return res.status(400).json({ message: 'Rating must be between 1 and 5' });
+    }
+
+    if (!category) {
+      console.log('Missing category');
+      return res.status(400).json({ message: 'Category is required' });
+    }
+
+    // Check if category is one of the allowed values
+    const validCategories = ['Very Bad', 'Bad', 'Good', 'Very Good', 'Best'];
+    if (!validCategories.includes(category)) {
+      console.log('Invalid category:', category);
+      return res.status(400).json({ 
+        message: 'Invalid category. Must be one of: ' + validCategories.join(', ')
+      });
+    }
+
     const newFeedback = new Feedback({
-      feedback: feedback.trim()
+      feedback: feedback.trim(),
+      rating: Number(rating),
+      category
     });
 
     console.log('Attempting to save feedback:', newFeedback);
