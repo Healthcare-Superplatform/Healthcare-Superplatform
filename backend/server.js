@@ -5,7 +5,6 @@ const dotenv = require('dotenv');
 const axios = require('axios'); // Import axios for making HTTP requests to OpenFDA
 const User = require('./models/User');
 const MedicalList = require('./models/MedicalList');
-const MedicalRecord = require('./models/MedicalRecord');
 const OwnMedical = require('./models/OwnMedical');
 const feedbackRoutes = require('./routes/feedback');
 const mockApi = require('./mockApiRoutes');
@@ -37,28 +36,7 @@ mongoose.connect('mongodb+srv://pankajchakrabarty22:P%40nkaj2025@superplatform-b
   console.error('❌ Error connecting to MongoDB:', err);
 
 });
-app.get('/', (req, res) => {
-  res.json({
-    status: 'success',
-    message: 'Healthcare Superplatform API',
-    version: '1.0.0',
-    availableRoutes: [
-      '/api/health',
-      '/api/users',
-      '/api/medical_list',
-      '/api/own_medical',
-      '/api/search_medicine',
-      '/api/recommendations/:ssn',
-    ],
-    documentation: 'https://github.com/Healthcare-Superplatform/Healthcare-Superplatform',
-  });
-});
 
-
-// ✅ Health Check Endpoint
-app.get('/health', (req, res) => {
-  res.status(200).json({ message: "Server is running!" });
-});
 
 // ✅ Fetch all users
 app.get('/users', async (req, res) => {
@@ -177,86 +155,11 @@ app.get('/search_medicine', async (req, res) => {
     }
   });
 
-  app.patch('/api/records/:id/archive', async (req, res) => {
-    try {
-      const record = await MedicalRecord.findByIdAndUpdate(
-        req.params.id,
-        { archived: true },
-        { new: true }
-      );
-      res.json(record);
-    } catch (error) {
-      res.status(500).json({ message: 'Error archiving record' });
-    }
-  });
-
-  app.get('/api/records/:ssn', async (req, res) => {
-    try {
-      const ssn = req.params.ssn.toString().trim();
-      console.log("🔍 Fetching records for SSN:", ssn);
   
-      const records = await MedicalRecord.find({ SSN: ssn });
-      console.log("📄 Found records:", records);
-  
-      if (records.length === 0) {
-        return res.status(404).json({ message: `No records found for SSN: ${ssn}` });
-      }
-  
-      const categorized = records.reduce((acc, record) => {
-        if (!acc[record.recordType]) acc[record.recordType] = [];
-        acc[record.recordType].push(record);
-        return acc;
-      }, {});
-  
-      res.status(200).json(categorized);
-    } catch (error) {
-      console.error('❌ Error fetching records:', error);
-      res.status(500).json({ message: 'Error fetching records', error });
-    }
-  });
-  
-  
-  
-
-  app.get('/api/recommendations/:ssn', async (req, res) => {
-    try {
-      const records = await MedicalRecord.find({ SSN: req.params.ssn });
-      const recommendations = generateRecommendations(records);
-      res.json(recommendations);
-    } catch (error) {
-      res.status(500).json({ message: 'Error generating recommendations' });
-    }
-  });
-
-  function generateRecommendations(records) {
-    const recommendations = [];
-    const abnormalLabs = records.filter(r => r.recordType === 'lab_result' && r.flags?.includes('abnormal'));
-    abnormalLabs.forEach(lab => {
-      recommendations.push({
-        type: 'lab_result',
-        priority: 'high',
-        message: `Abnormal ${lab.title} result detected`,
-        action: 'Please consult your healthcare provider',
-      });
-    });
-    return recommendations;
-  }
-  app.use('*', (req, res) => {
-    res.status(404).json({
-      status: 'error',
-      message: `Route ${req.originalUrl} not found`,
-      availableRoutes: [
-        '/',
-        '/api/health',
-        '/api/users',
-        '/api/medical_list',
-        '/api/own_medical',
-        '/api/search_medicine',
-        '/api/recommendations/:ssn'
-      ]
-    });
-  });
-  
+  // ✅ Catch-all for undefined routes
+app.use((req, res) => {
+  res.status(404).json({ message: "Route not found" });
+});
 
 // ✅ Start the server
 const PORT = process.env.PORT || 5001;
