@@ -102,39 +102,25 @@ const AIHealthAssistant = () => {
     text = text.toLowerCase().trim();
 
     const phrasesToRemove = [
-      "what medicine should i take for",
-      "what medicine can i take for",
-      "what should i take for",
-      "which medicine should i take for",
-      "which medicine can i take for",
-      "which medicine for",
-      "can you help me with",
-      "could you help me with",
-      "please help me with",
-      "can you help me for",
-      "could you help me for",
-      "please help me for",
-      "help me with",
-      "help me for",
-      "help me",
       "can you",
       "could you",
       "may i",
-      "can i",
       "should i",
       "please",
+      "help me with",
+      "help me for",
+      "help me",
+      "help",
+      "get help for",
       "what medicine",
       "which medicine",
+      "what should i take",
+      "what can i take",
       "how to treat",
       "give me",
       "i have",
       "recommend",
       "suggest",
-      "medicine for",
-      "medicine",
-      "medicines",
-      "drugs",
-      "drug",
       "for",
       "is",
       "with",
@@ -145,8 +131,10 @@ const AIHealthAssistant = () => {
       "use",
       "must",
       "get",
-      "what",
-      "how"
+      "medicine",
+      "medicines",
+      "drugs",
+      "drug",
     ];
 
     phrasesToRemove.forEach((phrase) => {
@@ -238,7 +226,7 @@ const AIHealthAssistant = () => {
       const medicalList = ownMedicals.split(",").map((item) => item.trim());
       const linkList = Link.split(",").map((item) => item.trim());
 
-      let message = `👤 <strong>Name:</strong> ${Name}<br/>📍 <strong>Location:</strong> ${Location}<br/><br/><strong>🩺 Your Own Medicals:</strong><br/>`;
+      let message = `👤 <strong>Name:</strong> ${Name}<br/>📍 <strong>Location:</strong> ${Location}<br/><br/><strong>🩺 Medical History:</strong><br/>`;
       medicalList.forEach((m, i) => {
         message += `- ${m} (<a href="${
           linkList[i] || "#"
