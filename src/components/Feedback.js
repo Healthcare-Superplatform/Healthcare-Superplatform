@@ -22,6 +22,34 @@ const Feedback = () => {
   const [feedback, setFeedback] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [averageRating, setAverageRating] = useState(0);
+  const [totalFeedbacks, setTotalFeedbacks] = useState(0);
+  const [showFeedbackForm, setShowFeedbackForm] = useState(true);
+
+  const fetchAverageRating = async () => {
+    try {
+      const response = await axios.get('/api/feedback/average', {
+        baseURL: 'http://localhost:5001'
+      });
+      setAverageRating(response.data.averageRating);
+      setTotalFeedbacks(response.data.totalCount);
+    } catch (error) {
+      console.error('Error fetching average rating:', error);
+    }
+  };
+
+  // Fetch average rating on component mount
+  React.useEffect(() => {
+    fetchAverageRating();
+  }, []);
+
+  const resetForm = () => {
+    setRating(0);
+    setFeedback('');
+    setShowFeedbackForm(false);
+    // Show new feedback form after a short delay
+    setTimeout(() => setShowFeedbackForm(true), 100);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -74,8 +102,9 @@ const Feedback = () => {
       if (response.status === 201) {
         setMessage('Thank you for your feedback!');
         setError('');
-        setRating(0);
-        setFeedback('');
+        setAverageRating(response.data.averageRating);
+        setTotalFeedbacks(response.data.totalCount);
+        resetForm();
       }
     } catch (error) {
       const errorDetails = {
@@ -134,17 +163,26 @@ const Feedback = () => {
       <h2>Rate Our Assistant</h2>
       <p className="feedback-description">Your feedback helps us improve our healthcare AI services</p>
       
-      <div className="rating-section">
-        <div className="rating-display">
-          <p>Your Rating:</p>
-          <StarRating rating={rating} onChange={setRating} />
-          {rating > 0 && <div className="rating-value">{rating.toFixed(1)}/5</div>}
+      {averageRating > 0 && (
+        <div className="average-rating">
+          <p>Average Rating: <strong>{averageRating.toFixed(1)}</strong>/5</p>
+          <p>Total Feedbacks: {totalFeedbacks}</p>
+        </div>
+      )}
+      
+      {showFeedbackForm && (
+        <>
+          <div className="rating-section">
+            <div className="rating-display">
+              <p>Your Rating:</p>
+              <StarRating rating={rating} onChange={setRating} allowFractional={true} />
+              {rating > 0 && <div className="rating-value">{rating.toFixed(1)}/5</div>}
         </div>
 
         {rating > 0 && <FeedbackCategory rating={rating} />}
       </div>
 
-      <form onSubmit={handleSubmit} className="feedback-form">
+      <form onSubmit={handleSubmit} className="feedback-form" key={showFeedbackForm ? 'visible' : 'hidden'}>
         <textarea
           value={feedback}
           onChange={(e) => setFeedback(e.target.value)}
@@ -163,6 +201,8 @@ const Feedback = () => {
         <p className={`feedback-message ${message.includes('Error') ? 'error' : 'success'}`}>
           {message}
         </p>
+      )}
+      </>
       )}
     </div>
   );

@@ -49,7 +49,24 @@ router.post('/', async (req, res) => {
     console.log('Attempting to save feedback:', newFeedback);
     await newFeedback.save();
     console.log('Feedback saved successfully');
-    res.status(201).json({ message: 'Feedback saved successfully' });
+    
+    // Calculate new average after saving
+    const result = await Feedback.aggregate([
+      { $group: {
+        _id: null,
+        averageRating: { $avg: '$rating' },
+        totalCount: { $sum: 1 }
+      }}
+    ]);
+    
+    const averageRating = result[0]?.averageRating || 0;
+    const totalCount = result[0]?.totalCount || 0;
+    
+    res.status(201).json({
+      message: 'Feedback saved successfully',
+      averageRating: Number(averageRating.toFixed(2)),
+      totalCount
+    });
   } catch (error) {
     console.error('Detailed error saving feedback:', error);
     if (error.name === 'ValidationError') {
@@ -59,6 +76,30 @@ router.post('/', async (req, res) => {
       return res.status(503).json({ message: 'Database error, please try again later' });
     }
     res.status(500).json({ message: 'Error saving feedback: ' + error.message });
+  }
+});
+
+// GET route to retrieve average rating
+router.get('/average', async (req, res) => {
+  try {
+    const result = await Feedback.aggregate([
+      { $group: {
+        _id: null,
+        averageRating: { $avg: '$rating' },
+        totalCount: { $sum: 1 }
+      }}
+    ]);
+    
+    const averageRating = result[0]?.averageRating || 0;
+    const totalCount = result[0]?.totalCount || 0;
+    
+    res.json({
+      averageRating: Number(averageRating.toFixed(2)),
+      totalCount
+    });
+  } catch (error) {
+    console.error('Error calculating average rating:', error);
+    res.status(500).json({ message: 'Error calculating average rating' });
   }
 });
 
