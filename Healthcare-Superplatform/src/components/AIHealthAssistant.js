@@ -1,17 +1,14 @@
-
 import React, { useState } from "react";
-import Login from "../pages/Login";
-import Feedback from "./Feedback";
-import "../styles/AIHealthAssistant.css";
-
 import Chatbox from "./AIHealthAssistant/Chatbox";
 import ChatInput from "./AIHealthAssistant/ChatInput";
 import FeedbackToggle from "./AIHealthAssistant/FeedbackToggle";
-
+import Login from "../pages/Login";
+import Feedback from "./Feedback";
 import extractDiseaseName from "../utils/extractDiseaseName";
 import fetchSSNData from "../api/fetchSSNData";
 import fetchMedicineData from "../api/fetchMedicineData";
 import fetchHealthStatus from "../api/fetchHealthStatus";
+import "../styles/AIHealthAssistant.css";
 
 const AIHealthAssistant = () => {
   const [input, setInput] = useState("");
@@ -29,23 +26,48 @@ const AIHealthAssistant = () => {
   const [showFeedbackOnly, setShowFeedbackOnly] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [loggedInUser, setLoggedInUser] = useState(null);
+  const [pendingComponent, setPendingComponent] = useState(null);
 
   const handleUserMessage = async () => {
     const userInput = input.trim();
     if (!userInput) return;
 
-    setMessages((prev) => [
-      ...prev,
-      { sender: "user", type: "text", text: userInput },
-    ]);
+    setMessages((prev) => [...prev, { sender: "user", type: "text", text: userInput }]);
     setInput("");
 
     const lowerInput = userInput.toLowerCase();
 
-    if (
-      lowerInput.includes("health info") ||
-      lowerInput.includes("my health")
-    ) {
+    const recordKeywords = ["medical record", "medical records", "record", "records"];
+    const healthKeywords = ["my health", "health info"];
+
+    if (recordKeywords.some((kw) => lowerInput.includes(kw))) {
+      if (!loggedInUser) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            sender: "bot",
+            type: "text",
+            text: "🔐 Please log in with your SSN and password to access your medical records.",
+          },
+        ]);
+        setPendingComponent("medicalRecordsPage");
+        setShowLogin(true);
+        return;
+      }
+
+      // Already logged in, show Medical Records Page inside chat
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "bot",
+          type: "component",
+          component: "medicalRecordsPage",
+        },
+      ]);
+      return;
+    }
+
+    if (healthKeywords.some((kw) => lowerInput.includes(kw))) {
       if (!loggedInUser) {
         setMessages((prev) => [
           ...prev,
@@ -100,7 +122,21 @@ const AIHealthAssistant = () => {
   const handleLoginSuccess = (ssn) => {
     setShowLogin(false);
     setLoggedInUser(ssn);
-    fetchHealthStatus(ssn, setMessages);
+
+    // If login was triggered for a component, show it now
+    if (pendingComponent === "medicalRecordsPage") {
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "bot",
+          type: "component",
+          component: "medicalRecordsPage",
+        },
+      ]);
+      setPendingComponent(null);
+    } else {
+      fetchHealthStatus(ssn, setMessages);
+    }
   };
 
   if (showFeedbackOnly) {
