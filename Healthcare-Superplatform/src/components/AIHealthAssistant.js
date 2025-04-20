@@ -31,15 +31,35 @@ const AIHealthAssistant = () => {
   const handleUserMessage = async () => {
     const userInput = input.trim();
     if (!userInput) return;
-
+  
     setMessages((prev) => [...prev, { sender: "user", type: "text", text: userInput }]);
     setInput("");
-
+  
     const lowerInput = userInput.toLowerCase();
-
+  
+    // 🛑 LOGOUT HANDLER
+    const logoutKeywords = ["logout", "log out", "sign out"];
+    if (logoutKeywords.some((kw) => lowerInput.includes(kw))) {
+      localStorage.removeItem("ssn");
+      localStorage.removeItem("userId");
+      localStorage.removeItem("userName");
+      localStorage.removeItem("firstSessionDone");
+      setLoggedInUser(null);
+  
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "bot",
+          type: "text",
+          text: "✅ You’ve been successfully logged out from all sessions.",
+        },
+      ]);
+      return;
+    }
+  
     const recordKeywords = ["medical record", "medical records", "record", "records"];
     const healthKeywords = ["my health", "health info"];
-
+  
     if (recordKeywords.some((kw) => lowerInput.includes(kw))) {
       if (!loggedInUser) {
         setMessages((prev) => [
@@ -54,8 +74,7 @@ const AIHealthAssistant = () => {
         setShowLogin(true);
         return;
       }
-
-      // Already logged in, show Medical Records Page inside chat
+  
       setMessages((prev) => [
         ...prev,
         {
@@ -66,7 +85,7 @@ const AIHealthAssistant = () => {
       ]);
       return;
     }
-
+  
     if (healthKeywords.some((kw) => lowerInput.includes(kw))) {
       if (!loggedInUser) {
         setMessages((prev) => [
@@ -80,11 +99,11 @@ const AIHealthAssistant = () => {
         setShowLogin(true);
         return;
       }
-
+  
       fetchHealthStatus(loggedInUser, setMessages);
       return;
     }
-
+  
     if (
       lowerInput.includes("symptom") ||
       lowerInput.includes("check symptoms") ||
@@ -97,13 +116,13 @@ const AIHealthAssistant = () => {
       ]);
       return;
     }
-
+  
     const ssnMatch = userInput.match(/\b\d{3}-\d{2}-\d{4}\b|\b\d{1,9}\b/);
     if (ssnMatch) {
       await fetchSSNData(ssnMatch[0], setMessages);
       return;
     }
-
+  
     const diseaseName = extractDiseaseName(userInput);
     if (diseaseName) {
       await fetchMedicineData(diseaseName, setMessages);
@@ -118,6 +137,7 @@ const AIHealthAssistant = () => {
       ]);
     }
   };
+  
 
   const handleLoginSuccess = (ssn) => {
     setShowLogin(false);
