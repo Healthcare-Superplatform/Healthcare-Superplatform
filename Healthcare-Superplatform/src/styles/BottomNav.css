@@ -1,0 +1,21 @@
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: #222;
+    color: white;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px;
+  }
+  
+  .bottom-nav a {
+    color: white;
+    text-decoration: none;
+    font-size: 1.5rem;
+  }
+  
+  .bottom-nav a:hover {
+    color: #007bff;
+  }
+  

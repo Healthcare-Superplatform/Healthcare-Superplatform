@@ -1,0 +1,19 @@
+.health-status-page {
+    display: flex;
+    height: 100vh;
+  }
+  
+  .main-content {
+    flex-grow: 1;
+    padding: 20px;
+    margin-left: 130px; /* ✅ Keeps content aligned with sidebar */
+    box-sizing: border-box;
+  }
+  
+  /* ✅ Adjust for smaller screens */
+  @media screen and (max-width: 768px) {
+    .main-content {
+      margin-left: 60px;
+    }
+  }
+  

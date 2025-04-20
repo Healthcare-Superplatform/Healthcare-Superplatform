@@ -1,0 +1,21 @@
+.appointments {
+  padding: 20px;
+}
+
+h2 {
+  font-size: 1.8rem;
+  color: #333;
+}
+
+.appointment-details {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 10px 0;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.appointment-details p {
+  font-size: 1rem;
+  margin: 5px 0;
+}

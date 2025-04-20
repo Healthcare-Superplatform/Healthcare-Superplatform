@@ -1,0 +1,44 @@
+.bg-white {
+  background-color: white;
+}
+
+.p-4 {
+  padding: 1rem;
+}
+
+.rounded-lg {
+  border-radius: 8px;
+}
+
+.shadow {
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.mt-2 {
+  margin-top: 10px;
+}
+
+.font-bold {
+  font-weight: bold;
+}
+
+.bg-blue-500 {
+  background-color: #2196f3;
+  padding: 6px 10px;
+  border-radius: 5px;
+  text-decoration: none;
+}
+
+.bg-blue-500:hover {
+  background-color: #1976d2;
+}
+
+.bg-green-500 {
+  background-color: #4caf50;
+  padding: 8px 12px;
+  border-radius: 5px;
+}
+
+.bg-green-500:hover {
+  background-color: #388e3c;
+}

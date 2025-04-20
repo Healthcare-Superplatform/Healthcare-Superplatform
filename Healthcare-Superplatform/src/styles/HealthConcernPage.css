@@ -1,0 +1,19 @@
+.health-concern-page {
+    display: flex;
+    height: 100vh;
+  }
+  
+  .main-content {
+    flex-grow: 1;
+    padding: 20px;
+    margin-left: 130px; /* ✅ Ensures content aligns next to sidebar */
+    box-sizing: border-box;
+  }
+  
+  /* ✅ Adjust layout for mobile screens */
+  @media screen and (max-width: 768px) {
+    .main-content {
+      margin-left: 60px; /* ✅ Aligns content when sidebar is collapsed */
+    }
+  }
+  

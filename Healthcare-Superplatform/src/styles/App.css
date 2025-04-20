@@ -1,0 +1,23 @@
+/* Layout Container: Uses Flexbox */
+.page-layout {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* ✅ Main Content Starts Next to Sidebar */
+.main-content {
+  flex-grow: 1;
+  padding: 20px;
+  width: calc(100% - 240px); /* ✅ Prevents content from going under sidebar */
+  margin-left: 130px; /* ✅ Ensures content starts after sidebar */
+  box-sizing: border-box;
+}
+
+/* ✅ Adjust for Collapsed Sidebar on Mobile */
+@media screen and (max-width: 768px) {
+  .main-content {
+    margin-left: 60px; /* ✅ Shift content when sidebar collapses */
+    width: calc(100% - 60px);
+  }
+}
