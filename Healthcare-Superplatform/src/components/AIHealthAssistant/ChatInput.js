@@ -184,17 +184,24 @@ const ChatInput = ({ input, setInput, onSend }) => {
       <div style={{ marginBottom: "0.5rem" }}>
         <label htmlFor="language-select">🎙️ Voice Language: </label>
         <select
-          id="language-select"
-          value={selectedLang}
-          onChange={(e) => setSelectedLang(e.target.value)}
-        >
-          <option value="en-US">English</option>
-          <option value="bn-BD">Bangla</option>
-          <option value="hi-IN">Hindi</option>
-          <option value="ur-PK">Urdu</option>
-          <option value="es-ES">Spanish</option>
-          <option value="fr-FR">French</option>
-        </select>
+  id="language-select"
+  value={selectedLang}
+  onChange={(e) => setSelectedLang(e.target.value)}
+>
+  <option value="en-US">English</option>
+  <option value="bn-BD">Bangla</option>
+  <option value="hi-IN">Hindi</option>
+  <option value="ur-PK">Urdu</option>
+  <option value="es-ES">Spanish</option>
+  <option value="fr-FR">French</option>
+  <option value="fi-FI">Finnish</option>
+  <option value="zh-CN">Chinese (Simplified)</option>
+  <option value="ko-KR">Korean</option>
+  <option value="ja-JP">Japanese</option>
+  <option value="sv-SE">Swedish</option>
+  <option value="vi-VN">Vietnamese</option>
+</select>
+
       </div>
 
       <input
