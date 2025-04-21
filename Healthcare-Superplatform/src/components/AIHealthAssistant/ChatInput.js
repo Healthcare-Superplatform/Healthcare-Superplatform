@@ -3,30 +3,36 @@ import React, { useState, useEffect, useRef } from "react";
 // 🔠 Convert number words like "one zero seven" → "107"
 const numberWordsToDigits = (text) => {
   const numbersMap = {
-    zero: "0",
-    one: "1",
-    two: "2",
-    three: "3",
-    four: "4",
-    five: "5",
-    six: "6",
-    seven: "7",
-    eight: "8",
-    nine: "9",
-    ten: "10",
+    zero: "0", one: "1", two: "2", three: "3", four: "4",
+    five: "5", six: "6", seven: "7", eight: "8", nine: "9", ten: "10",
   };
 
-  const words = text.split(/\s+/);
-  return words
-    .map((word) => {
-      const lower = word.toLowerCase();
-      return numbersMap[lower] !== undefined ? numbersMap[lower] : word;
-    })
-    .join(" ");
+  return text.split(/\s+/).map(word => {
+    const lower = word.toLowerCase();
+    return numbersMap[lower] !== undefined ? numbersMap[lower] : word;
+  }).join(" ");
 };
 
+// 🧠 Fix common misrecognitions
+const autoCorrect = (text) => {
+  const corrections = {
+    sympatom: "symptom",
+    symtom: "symptom",
+    medecine: "medicine",
+    feverr: "fever",
+    diabetis: "diabetes",
+  };
+
+  return text.split(/\s+/).map(word => {
+    const lower = word.toLowerCase();
+    return corrections[lower] || word;
+  }).join(" ");
+};
+
+// 🌍 LibreTranslate endpoint
 const API_BASE = "https://translate.astian.org";
 
+// 🌍 Detect language from text
 const detectLanguage = async (text) => {
   try {
     const res = await fetch(`${API_BASE}/detect`, {
@@ -34,20 +40,19 @@ const detectLanguage = async (text) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ q: text }),
     });
-
     const data = await res.json();
     return data[0]?.language || "auto";
-  } catch (err) {
-    console.error("Language detection failed:", err);
+  } catch {
     return "auto";
   }
 };
 
+// 🌐 Translate to English
 const translateToEnglish = async (text) => {
   const sourceLang = await detectLanguage(text);
 
   try {
-    const libreRes = await fetch(`${API_BASE}/translate`, {
+    const res = await fetch(`${API_BASE}/translate`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -57,25 +62,20 @@ const translateToEnglish = async (text) => {
         format: "text",
       }),
     });
+    const data = await res.json();
+    if (data?.translatedText) return data.translatedText;
+  } catch {}
 
-    const libreData = await libreRes.json();
-    if (libreData?.translatedText && libreData.translatedText !== text) {
-      return libreData.translatedText;
-    }
-  } catch (err) {
-    console.warn("LibreTranslate failed:", err.message);
-  }
-
+  // Fallback: Google Translate (unofficial)
   try {
-    const googleRes = await fetch(
+    const res = await fetch(
       `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${encodeURIComponent(
         text
       )}`
     );
-    const googleData = await googleRes.json();
-    return googleData[0]?.map((seg) => seg[0]).join("") || text;
-  } catch (err) {
-    console.error("Google fallback failed:", err.message);
+    const data = await res.json();
+    return data[0]?.map((seg) => seg[0]).join("") || text;
+  } catch {
     return text;
   }
 };
@@ -89,94 +89,71 @@ const ChatInput = ({ input, setInput, onSend }) => {
   const silenceTimer = useRef(null);
 
   useEffect(() => {
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
-  
-    if (!SpeechRecognition) {
-      console.warn("Speech Recognition not supported");
-      return;
-    }
-  
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) return console.warn("Speech Recognition not supported");
+
     const recognition = new SpeechRecognition();
     recognition.lang = selectedLang;
     recognition.interimResults = true;
     recognition.continuous = true;
     recognition.maxAlternatives = 1;
-  
+
     const resetSilenceTimer = () => {
       clearTimeout(silenceTimer.current);
       silenceTimer.current = setTimeout(() => {
-        recognition.stop(); // stop after 10s of silence
-      }, 3500); // 3.5 seconds
+        recognition.stop(); // Stop after ~3s of silence
+      }, 3500);
     };
-  
+
     recognition.onstart = () => {
       transcriptRef.current = "";
       resetSilenceTimer();
-      console.log("🎙️ Continuous recognition started");
     };
-  
+
     recognition.onresult = (event) => {
-      let interimTranscript = "";
+      let interim = "";
       for (let i = event.resultIndex; i < event.results.length; ++i) {
-        interimTranscript += event.results[i][0].transcript;
+        interim += event.results[i][0].transcript;
       }
-  
-      transcriptRef.current = interimTranscript; // ✅ Save final text
-      setInput(interimTranscript);               // ✅ Show in box
-      resetSilenceTimer();                       // ✅ Reset timer
+      transcriptRef.current = interim;
+      setInput(interim);
+      resetSilenceTimer();
     };
-  
+
     recognition.onerror = (event) => {
-      console.error("Speech recognition error:", event.error);
+      console.error("Recognition error:", event.error);
       setListening(false);
       clearTimeout(silenceTimer.current);
     };
-  
+
     recognition.onend = async () => {
       clearTimeout(silenceTimer.current);
       setListening(false);
-  
+
       let finalText = transcriptRef.current.trim();
       if (!finalText) return;
-  
+
       const translated = await translateToEnglish(finalText);
-      const processedText = numberWordsToDigits(translated);
-  
-      setInput(processedText);
-  
+      const corrected = autoCorrect(translated);
+      const processed = numberWordsToDigits(corrected);
+      setInput(processed);
+
       setTimeout(() => {
         if (inputBoxRef.current) {
-          const enterEvent = new KeyboardEvent("keydown", {
-            key: "Enter",
-            code: "Enter",
-            bubbles: true,
-          });
-          inputBoxRef.current.dispatchEvent(enterEvent);
+          inputBoxRef.current.dispatchEvent(new KeyboardEvent("keydown", {
+            key: "Enter", code: "Enter", bubbles: true
+          }));
         }
       }, 200);
     };
-  
+
     recognitionRef.current = recognition;
   }, [setInput, onSend, selectedLang]);
-  
-
-  const startListening = () => {
-    if (!listening && recognitionRef.current) {
-      recognitionRef.current.start();
-      setListening(true);
-    }
-  };
-
-  const stopListening = () => {
-    if (listening && recognitionRef.current) {
-      recognitionRef.current.stop();
-    }
-  };
 
   const toggleListening = () => {
-    if (listening) stopListening();
-    else startListening();
+    if (listening) recognitionRef.current?.stop();
+    else recognitionRef.current?.start();
+    setListening(!listening);
   };
 
   return (
@@ -195,7 +172,7 @@ const ChatInput = ({ input, setInput, onSend }) => {
           <option value="es-ES">Spanish</option>
           <option value="fr-FR">French</option>
           <option value="fi-FI">Finnish</option>
-          <option value="zh-CN">Chinese (Simplified)</option>
+          <option value="zh-CN">Chinese</option>
           <option value="ko-KR">Korean</option>
           <option value="ja-JP">Japanese</option>
           <option value="sv-SE">Swedish</option>
@@ -212,11 +189,7 @@ const ChatInput = ({ input, setInput, onSend }) => {
         onKeyDown={(e) => e.key === "Enter" && onSend()}
       />
       <button onClick={onSend}>Send</button>
-      <button
-        onClick={toggleListening}
-        title="Voice Input"
-        style={{ marginLeft: "8px" }}
-      >
+      <button onClick={toggleListening} style={{ marginLeft: "8px" }}>
         {listening ? "🎙️ Listening..." : "🎤"}
       </button>
     </div>
