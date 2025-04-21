@@ -25,10 +25,8 @@ const numberWordsToDigits = (text) => {
     .join(" ");
 };
 
-// 🌍 Set a reliable LibreTranslate instance
 const API_BASE = "https://translate.astian.org";
 
-// 🌍 Detect the source language from text
 const detectLanguage = async (text) => {
   try {
     const res = await fetch(`${API_BASE}/detect`, {
@@ -45,13 +43,11 @@ const detectLanguage = async (text) => {
   }
 };
 
-// 🌐 Translate any language → English
 const translateToEnglish = async (text) => {
   const sourceLang = await detectLanguage(text);
 
   try {
-    // Try LibreTranslate first
-    const libreRes = await fetch("https://translate.astian.org/translate", {
+    const libreRes = await fetch(`${API_BASE}/translate`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -71,7 +67,6 @@ const translateToEnglish = async (text) => {
   }
 
   try {
-    // 🔄 Fallback to unofficial Google Translate API
     const googleRes = await fetch(
       `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${encodeURIComponent(
         text
@@ -96,56 +91,60 @@ const ChatInput = ({ input, setInput, onSend }) => {
   useEffect(() => {
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
-
+  
     if (!SpeechRecognition) {
       console.warn("Speech Recognition not supported");
       return;
     }
-
+  
     const recognition = new SpeechRecognition();
-    recognition.lang = selectedLang; // 🌍 Dynamic language support
-    recognition.interimResults = false;
+    recognition.lang = selectedLang;
+    recognition.interimResults = true;
+    recognition.continuous = true;
     recognition.maxAlternatives = 1;
-
+  
     const resetSilenceTimer = () => {
       clearTimeout(silenceTimer.current);
       silenceTimer.current = setTimeout(() => {
-        recognition.stop(); // Stop after 3.5s of silence
-      }, 3500);
+        recognition.stop(); // stop after 10s of silence
+      }, 3500); // 3.5 seconds
     };
-
+  
     recognition.onstart = () => {
       transcriptRef.current = "";
       resetSilenceTimer();
-      console.log("🎙️ Voice recognition started");
+      console.log("🎙️ Continuous recognition started");
     };
-
+  
     recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      transcriptRef.current += " " + transcript;
-      setInput((prev) => (prev ? prev + " " + transcript : transcript));
-      resetSilenceTimer();
+      let interimTranscript = "";
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        interimTranscript += event.results[i][0].transcript;
+      }
+  
+      transcriptRef.current = interimTranscript; // ✅ Save final text
+      setInput(interimTranscript);               // ✅ Show in box
+      resetSilenceTimer();                       // ✅ Reset timer
     };
-
+  
     recognition.onerror = (event) => {
       console.error("Speech recognition error:", event.error);
       setListening(false);
       clearTimeout(silenceTimer.current);
     };
-
+  
     recognition.onend = async () => {
       clearTimeout(silenceTimer.current);
       setListening(false);
-
+  
       let finalText = transcriptRef.current.trim();
       if (!finalText) return;
-
-      // 🌍 Translate → 🔢 Convert → ⏎ Submit
+  
       const translated = await translateToEnglish(finalText);
       const processedText = numberWordsToDigits(translated);
-
+  
       setInput(processedText);
-
+  
       setTimeout(() => {
         if (inputBoxRef.current) {
           const enterEvent = new KeyboardEvent("keydown", {
@@ -157,9 +156,10 @@ const ChatInput = ({ input, setInput, onSend }) => {
         }
       }, 200);
     };
-
+  
     recognitionRef.current = recognition;
   }, [setInput, onSend, selectedLang]);
+  
 
   const startListening = () => {
     if (!listening && recognitionRef.current) {
@@ -184,24 +184,23 @@ const ChatInput = ({ input, setInput, onSend }) => {
       <div style={{ marginBottom: "0.5rem" }}>
         <label htmlFor="language-select">🎙️ Voice Language: </label>
         <select
-  id="language-select"
-  value={selectedLang}
-  onChange={(e) => setSelectedLang(e.target.value)}
->
-  <option value="en-US">English</option>
-  <option value="bn-BD">Bangla</option>
-  <option value="hi-IN">Hindi</option>
-  <option value="ur-PK">Urdu</option>
-  <option value="es-ES">Spanish</option>
-  <option value="fr-FR">French</option>
-  <option value="fi-FI">Finnish</option>
-  <option value="zh-CN">Chinese (Simplified)</option>
-  <option value="ko-KR">Korean</option>
-  <option value="ja-JP">Japanese</option>
-  <option value="sv-SE">Swedish</option>
-  <option value="vi-VN">Vietnamese</option>
-</select>
-
+          id="language-select"
+          value={selectedLang}
+          onChange={(e) => setSelectedLang(e.target.value)}
+        >
+          <option value="en-US">English</option>
+          <option value="bn-BD">Bangla</option>
+          <option value="hi-IN">Hindi</option>
+          <option value="ur-PK">Urdu</option>
+          <option value="es-ES">Spanish</option>
+          <option value="fr-FR">French</option>
+          <option value="fi-FI">Finnish</option>
+          <option value="zh-CN">Chinese (Simplified)</option>
+          <option value="ko-KR">Korean</option>
+          <option value="ja-JP">Japanese</option>
+          <option value="sv-SE">Swedish</option>
+          <option value="vi-VN">Vietnamese</option>
+        </select>
       </div>
 
       <input
