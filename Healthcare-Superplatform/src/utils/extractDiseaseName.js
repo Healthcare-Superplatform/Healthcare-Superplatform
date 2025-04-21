@@ -1,8 +1,9 @@
-
 const extractDiseaseName = (text) => {
   if (!text) return null;
+
   text = text.toLowerCase().trim();
 
+  // ✅ Expandable pattern-based cleanup
   const phrasesToRemove = [
     "what medicine should i take for",
     "what medicine can i take for",
@@ -24,6 +25,10 @@ const extractDiseaseName = (text) => {
     "may i",
     "can i",
     "should i",
+    "i want",
+    "i need",
+    "need",
+    "want",
     "please",
     "what medicine",
     "which medicine",
@@ -48,16 +53,19 @@ const extractDiseaseName = (text) => {
     "must",
     "get",
     "what",
-    "how"
+    "how",
   ];
 
   phrasesToRemove.forEach((phrase) => {
     const regex = new RegExp(`\\b${phrase}\\b`, "gi");
-    text = text.replace(regex, "");
+    text = text.replace(regex, " ");
   });
 
+  // 🧼 Clean up punctuation and double spaces
   text = text.replace(/[^\w\s]/gi, "").replace(/\s{2,}/g, " ").trim();
-  return text.length > 2 ? text : null;
+
+  // ✅ Only return if there's something meaningful
+  return text.length > 1 ? text : null;
 };
 
 export default extractDiseaseName;
