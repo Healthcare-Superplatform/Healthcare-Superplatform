@@ -65,12 +65,6 @@ const MedicalRecordsPage = () => {
       <div className="main-content">
         <Header title="Medical Records" />
 
-        {firstSession && (
-          <div className="logout-button-container" style={{ textAlign: 'right', margin: '10px' }}>
-            <button onClick={handleLogout} style={{ padding: '6px 12px' }}>🚪 Logout</button>
-          </div>
-        )}
-
         <div className="records-content">
           <RecordCategoryTabs
             categories={recordCategories}

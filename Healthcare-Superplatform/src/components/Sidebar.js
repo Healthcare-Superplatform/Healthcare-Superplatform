@@ -101,13 +101,6 @@ const Sidebar = () => {
         <li><Link to="/ai-health-assistant">🤖 AI Health Assistant</Link></li>
         <li><Link to="/symptom-checker">🤖 Symptom Checker</Link></li>
         <li><Link to="/settings">⚙️ Settings</Link></li>
-
-        {/* ✅ Logout only if logged in */}
-        {isLoggedIn && (
-          <li style={{ marginTop: "20px", textAlign: "center" }}>
-            <button onClick={handleLogout} className="logout-btn">🚪 Logout</button>
-          </li>
-        )}
       </ul>
     </nav>
   );
