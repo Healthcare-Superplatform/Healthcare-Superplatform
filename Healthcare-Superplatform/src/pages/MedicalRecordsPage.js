@@ -11,7 +11,7 @@ const MedicalRecordsPage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [checking, setChecking] = useState(true);
   const [loginKey, setLoginKey] = useState(0);
-  const [firstSession, setFirstSession] = useState(!localStorage.getItem("firstSessionDone"));
+ 
 
   useEffect(() => {
     const ssn = localStorage.getItem('ssn');
@@ -44,17 +44,9 @@ const MedicalRecordsPage = () => {
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
     setLoginKey(prev => prev + 1);
-    setFirstSession(false);
-    localStorage.setItem("firstSessionDone", "true");
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('ssn');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('userName');
-    setIsLoggedIn(false);
-    setLoginKey(prev => prev + 1);
-  };
+
 
   if (checking) return <div>🔒 Checking authentication...</div>;
   if (!isLoggedIn) return <Login setIsLoggedIn={handleLoginSuccess} key={`login-${loginKey}`} />;

@@ -15,6 +15,7 @@ const SymptomChecker = () => {
   const [explanation, setExplanation] = useState("");
   const [matchedSymptomIds, setMatchedSymptomIds] = useState([]);
   const [highlightedIds, setHighlightedIds] = useState([]);
+  const [warning, setWarning] = useState("");
 
   useEffect(() => {
     axios.get("/api/symptoms").then((res) => setSymptomsList(res.data));
@@ -31,16 +32,14 @@ const SymptomChecker = () => {
     const inputWords = input.split(/\s+/);
     const matchedIds = [];
     const highlights = [];
-  
+
     symptomsList.forEach((symptom) => {
       const name = symptom.name.toLowerCase();
-  
-      // Full match on symptom name (even multi-word match)
+
       if (input.includes(name)) {
         matchedIds.push(symptom.id);
       }
-  
-      // Partial match on individual words (min 2 letters)
+
       for (let word of inputWords) {
         if (word.length >= 2 && name.includes(word)) {
           highlights.push(symptom.id);
@@ -48,14 +47,21 @@ const SymptomChecker = () => {
         }
       }
     });
-  
+
     setSelectedSymptoms((prev) => [...new Set([...prev, ...matchedIds])]);
     setMatchedSymptomIds(matchedIds);
     setHighlightedIds(highlights);
+    setWarning(""); // Clear warning if any symptom found
   };
-  
 
   const getDiagnosis = async () => {
+    if (selectedSymptoms.length === 0) {
+      setWarning("⚠️ Please select at least one symptom before continuing.");
+      return;
+    }
+
+    setWarning("");
+
     const res = await axios.post("/api/diagnosis", {
       age,
       gender,
@@ -106,6 +112,7 @@ const SymptomChecker = () => {
   };
 
   const getTriage = async () => {
+    if (selectedSymptoms.length === 0) return;
     const res = await axios.post("/api/triage", {
       age,
       gender,
@@ -115,13 +122,13 @@ const SymptomChecker = () => {
   };
 
   const getExplanation = async () => {
+    if (selectedSymptoms.length === 0) return;
     const res = await axios.post("/api/explain", {
       symptoms: selectedSymptoms,
     });
     setExplanation(res.data.explanation);
   };
 
-  // Sort symptom list: matched symptoms first
   const sortedSymptoms = [...symptomsList].sort((a, b) => {
     const aMatch = matchedSymptomIds.includes(a.id) ? -1 : 0;
     const bMatch = matchedSymptomIds.includes(b.id) ? -1 : 0;
@@ -189,8 +196,12 @@ const SymptomChecker = () => {
         ))}
       </ul>
 
+      {warning && (
+        <p style={{ color: "red", marginTop: 10 }}>{warning}</p>
+      )}
+
       <button onClick={getDiagnosis} style={{ marginTop: 20 }}>
-        Get Diagnosis
+        Get Tests
       </button>
 
       {question && (
