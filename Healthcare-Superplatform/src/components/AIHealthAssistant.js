@@ -108,19 +108,16 @@ const AIHealthAssistant = () => {
     }
 
     if (lowerInput.includes("how to use")) {
-      setActiveInfoBox("how");
       showInstructionContent("how");
       return;
     }
 
-    if (lowerInput.includes("about chatbot")) {
-      setActiveInfoBox("about");
+    if (["about chatbot", "about you"].some((kw) => lowerInput.includes(kw))) {
       showInstructionContent("about");
       return;
     }
 
     if (["features", "feature", "available feature", "available features"].some((kw) => lowerInput.includes(kw))) {
-      setActiveInfoBox("features");
       showInstructionContent("features");
       return;
     }
