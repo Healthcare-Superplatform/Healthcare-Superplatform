@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Chatbox from "./AIHealthAssistant/Chatbox";
 import ChatInput from "./AIHealthAssistant/ChatInput";
 import FeedbackToggle from "./AIHealthAssistant/FeedbackToggle";
@@ -18,9 +18,79 @@ const AIHealthAssistant = () => {
   const [loggedInUser, setLoggedInUser] = useState(null);
   const [pendingComponent, setPendingComponent] = useState(null);
   const [activeInfoBox, setActiveInfoBox] = useState(null);
+  const voicesRef = useRef([]);
+
+  useEffect(() => {
+    const loadVoices = () => {
+      voicesRef.current = speechSynthesis.getVoices();
+    };
+    loadVoices();
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+      speechSynthesis.onvoiceschanged = loadVoices;
+    }
+  }, []);
+
+  const speakText = (htmlText) => {
+    const plainText = htmlText
+      .replace(/<[^>]+>/g, "")
+      .replace(/[^\w\s.,!?\n]/g, "")
+      .replace(/\n+/g, "\n")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    const withPauses = plainText.split(/(?<=[.!?])\s+/).join(".\n\n");
+
+    const utterance = new SpeechSynthesisUtterance(withPauses);
+    utterance.lang = "en-US";
+    utterance.rate = 0.85;
+
+    const femaleVoice =
+      voicesRef.current.find((v) => /female|woman|zira|susan|samantha/i.test(v.name)) ||
+      voicesRef.current.find((v) => v.name.toLowerCase().includes("en"));
+
+    if (femaleVoice) {
+      utterance.voice = femaleVoice;
+    }
+
+    speechSynthesis.cancel();
+    speechSynthesis.speak(utterance);
+  };
 
   const handleInfoClick = (type) => {
     setActiveInfoBox((prev) => (prev === type ? null : type));
+  };
+
+  const showInstructionContent = (type) => {
+    let text = "";
+
+    if (type === "how") {
+      text = `
+        <ul>
+          <li>Enter your SSN to access hospital info.</li>
+          <li>Ask for Health info to access health status.</li>
+          <li>Ask for records to access medical records.</li>
+          <li>Type symptoms or check symptoms to use the Symptom Checker.</li>
+          <li>Ask for medicine suggestions for a specific disease.</li>
+        </ul>`;
+    } else if (type === "about") {
+      text = `<p>This AI chatbot helps you check symptoms, view records, get medicine suggestions, and more. Voice and multilingual support is included.</p>`;
+    } else if (type === "features") {
+      text = `
+        <ul>
+          <li>✅ SSN-based hospital info.</li>
+          <li>✅ Medical record viewer.</li>
+          <li>✅ Health status display.</li>
+          <li>✅ Symptom checker + follow-ups.</li>
+          <li>✅ Triage and explanation engine.</li>
+          <li>✅ Medicine lookup.</li>
+          <li>✅ Voice & multilingual input.</li>
+          <li>✅ Keyword search & Q&A.</li>
+          <li>✅ Feedback system.</li>
+        </ul>`;
+    }
+
+    setMessages((prev) => [...prev, { sender: "bot", type: "text", text }]);
+    speakText(text);
   };
 
   const handleUserMessage = async () => {
@@ -32,14 +102,34 @@ const AIHealthAssistant = () => {
 
     const lowerInput = userInput.toLowerCase();
 
+    if (lowerInput === "stop") {
+      speechSynthesis.cancel();
+      return;
+    }
+
+    if (lowerInput.includes("how to use")) {
+      setActiveInfoBox("how");
+      showInstructionContent("how");
+      return;
+    }
+
+    if (lowerInput.includes("about chatbot")) {
+      setActiveInfoBox("about");
+      showInstructionContent("about");
+      return;
+    }
+
+    if (["features", "feature", "available feature", "available features"].some((kw) => lowerInput.includes(kw))) {
+      setActiveInfoBox("features");
+      showInstructionContent("features");
+      return;
+    }
+
     const logoutKeywords = ["logout", "log out", "sign out"];
     if (logoutKeywords.some((kw) => lowerInput.includes(kw))) {
       localStorage.clear();
       setLoggedInUser(null);
-      setMessages((prev) => [
-        ...prev,
-        { sender: "bot", type: "text", text: "✅ You’ve been successfully logged out." },
-      ]);
+      setMessages((prev) => [...prev, { sender: "bot", type: "text", text: "✅ You’ve been successfully logged out." }]);
       return;
     }
 
@@ -48,28 +138,18 @@ const AIHealthAssistant = () => {
 
     if (recordKeywords.some((kw) => lowerInput.includes(kw))) {
       if (!loggedInUser) {
-        setMessages((prev) => [
-          ...prev,
-          { sender: "bot", type: "text", text: "🔐 Please log in to access your medical records." },
-        ]);
+        setMessages((prev) => [...prev, { sender: "bot", type: "text", text: "🔐 Please log in to access your medical records." }]);
         setPendingComponent("medicalRecordsPage");
         setShowLogin(true);
         return;
       }
-
-      setMessages((prev) => [
-        ...prev,
-        { sender: "bot", type: "component", component: "medicalRecordsPage" },
-      ]);
+      setMessages((prev) => [...prev, { sender: "bot", type: "component", component: "medicalRecordsPage" }]);
       return;
     }
 
     if (healthKeywords.some((kw) => lowerInput.includes(kw))) {
       if (!loggedInUser) {
-        setMessages((prev) => [
-          ...prev,
-          { sender: "bot", type: "text", text: "🔐 Please log in to access your health status." },
-        ]);
+        setMessages((prev) => [...prev, { sender: "bot", type: "text", text: "🔐 Please log in to access your health status." }]);
         setShowLogin(true);
         return;
       }
@@ -77,11 +157,7 @@ const AIHealthAssistant = () => {
       return;
     }
 
-    if (
-      lowerInput.includes("symptom") ||
-      lowerInput.includes("check symptoms") ||
-      lowerInput.includes("open symptom checker")
-    ) {
+    if (lowerInput.includes("symptom")) {
       setMessages((prev) => [
         ...prev,
         { sender: "bot", type: "text", text: "🩺 Opening Symptom Checker..." },
@@ -100,10 +176,7 @@ const AIHealthAssistant = () => {
     if (diseaseName) {
       await fetchMedicineData(diseaseName, setMessages);
     } else {
-      setMessages((prev) => [
-        ...prev,
-        { sender: "bot", type: "text", text: "ℹ️ Please specify a disease clearly." },
-      ]);
+      setMessages((prev) => [...prev, { sender: "bot", type: "text", text: "ℹ️ Please specify a disease clearly." }]);
     }
   };
 
@@ -112,10 +185,7 @@ const AIHealthAssistant = () => {
     setLoggedInUser(ssn);
 
     if (pendingComponent === "medicalRecordsPage") {
-      setMessages((prev) => [
-        ...prev,
-        { sender: "bot", type: "component", component: "medicalRecordsPage" },
-      ]);
+      setMessages((prev) => [...prev, { sender: "bot", type: "component", component: "medicalRecordsPage" }]);
       setPendingComponent(null);
     } else {
       fetchHealthStatus(ssn, setMessages);
@@ -137,7 +207,6 @@ const AIHealthAssistant = () => {
     <div className="ai-health-assistant">
       <h2>🤖 AI Health Assistant Chatbot</h2>
 
-      {/* Initial Instructional Message */}
       <div className="instruction-box">
         <div style={{ textAlign: "center", marginBottom: "1rem" }}>
           <strong>Hi! How can I help you today?</strong>
@@ -153,9 +222,9 @@ const AIHealthAssistant = () => {
           {activeInfoBox === "how" && (
             <div className="info-box">
               <ul>
-                <li>Enter your SSN to access health hospital info.</li>
-                <li>ask for Health info to access health status</li>
-                <li>ask for records to access medical records</li>
+                <li>Enter your SSN to access hospital info.</li>
+                <li>Ask for Health info to access health status.</li>
+                <li>Ask for records to access medical records.</li>
                 <li>Type symptoms or check symptoms to use the Symptom Checker.</li>
                 <li>Ask for medicine suggestions for a specific disease.</li>
               </ul>
@@ -164,26 +233,22 @@ const AIHealthAssistant = () => {
 
           {activeInfoBox === "about" && (
             <div className="info-box">
-              <p>
-                This AI chatbot assists with checking symptoms, viewing health records,
-                shows present health status, suggesting medicines, and giving medical triage advice. Voice and language
-                support included. Also search by keywords or ask questions.
-              </p>
+              <p>This AI chatbot helps you check symptoms, view records, get medicine suggestions, and more. Voice and multilingual support is included.</p>
             </div>
           )}
 
           {activeInfoBox === "features" && (
             <div className="info-box">
               <ul>
-                <li>✅ SSN-based hospital info</li>
-                <li>✅ SSN-based medical record check</li>
-                <li>✅ Present health status check</li>
-                <li>✅ Symptom checker and follow-up questions</li>
-                <li>✅ Triage and explanation engine</li>
-                <li>✅ Medicine suggestions</li>
-                <li>✅ Multi-language & voice input</li>
-                <li>✅ Search by keyword or ask questions</li>
-                <li>✅ Enhanced feedback system</li>
+                <li>✅ SSN-based hospital info.</li>
+                <li>✅ Medical record viewer.</li>
+                <li>✅ Health status display.</li>
+                <li>✅ Symptom checker + follow-ups.</li>
+                <li>✅ Triage and explanation engine.</li>
+                <li>✅ Medicine lookup.</li>
+                <li>✅ Voice & multilingual input.</li>
+                <li>✅ Keyword search & Q&A.</li>
+                <li>✅ Feedback system.</li>
               </ul>
             </div>
           )}
