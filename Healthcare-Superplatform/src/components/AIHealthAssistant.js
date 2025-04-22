@@ -111,7 +111,7 @@ const AIHealthAssistant = () => {
     if (["how to use", "how can i use you", "how to use you",
      "how you are effective", "which way i can use you", 
      "what is the way to drive you", "what is the way to use you",
-     "how can drive you", "how can i drive you"].some((kw) => lowerInput.includes(kw))) {
+     "how can drive you", "how can i drive you", "which way you are effective"].some((kw) => lowerInput.includes(kw))) {
       showInstructionContent("how");
       return;
     }
