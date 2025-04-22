@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Chatbox from "./AIHealthAssistant/Chatbox";
 import ChatInput from "./AIHealthAssistant/ChatInput";
+import { isGreeting, getGreetingResponse } from "./AIHealthAssistant/greetingResponses";
 import FeedbackToggle from "./AIHealthAssistant/FeedbackToggle";
 import Login from "../pages/Login";
 import Feedback from "./Feedback";
@@ -132,7 +133,13 @@ const AIHealthAssistant = () => {
       setMessages((prev) => [...prev, { sender: "bot", type: "text", text: "✅ You’ve been successfully logged out." }]);
       return;
     }
-
+    if (isGreeting(lowerInput)) {
+      const greetingReply = getGreetingResponse();
+      setMessages((prev) => [...prev, { sender: "bot", type: "text", text: greetingReply }]);
+      speakText(greetingReply);
+      return;
+    }
+    
     const recordKeywords = ["medical record", "records"];
     const healthKeywords = ["my health", "health info"];
 
