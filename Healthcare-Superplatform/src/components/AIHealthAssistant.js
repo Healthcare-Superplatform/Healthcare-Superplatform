@@ -133,6 +133,16 @@ const AIHealthAssistant = () => {
       setMessages((prev) => [...prev, { sender: "bot", type: "text", text: "✅ You’ve been successfully logged out." }]);
       return;
     }
+    const emergencyKeywords = ["emergency", "emergency service", "emergency services", "emergencies"];
+if (emergencyKeywords.some((kw) => lowerInput.includes(kw))) {
+  setMessages((prev) => [
+    ...prev,
+    { sender: "bot", type: "text", text: "🚨 Opening Emergency Medical Services..." },
+    { sender: "bot", type: "component", component: "emergencyMedicalPage" }
+  ]);
+  return;
+}
+
     if (isGreeting(lowerInput)) {
       const greetingReply = getGreetingResponse();
       setMessages((prev) => [...prev, { sender: "bot", type: "text", text: greetingReply }]);

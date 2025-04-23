@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../../components/Sidebar';
 import Header from '../../components/Header';
@@ -6,7 +5,7 @@ import '../../styles/Emergency.css';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
-const EmergencyMedicalPage = () => {
+const EmergencyMedicalPage = ({ embedded = false }) => {
   const hospitals = [
     { id: 1, name: "Oulu University Hospital (OYS)" },
     { id: 2, name: "Finnish Student Health Service(FSHS)" },
@@ -15,7 +14,6 @@ const EmergencyMedicalPage = () => {
     { id: 5, name: "Terveystalo Oulu" },
   ];
 
-  // State management
   const [selectedHospital, setSelectedHospital] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [phone, setPhone] = useState('');
@@ -27,12 +25,10 @@ const EmergencyMedicalPage = () => {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState('');
   const [serviceDate, setServiceDate] = useState('');
 
-  // Filter hospitals based on search term
   const filteredHospitals = hospitals.filter(hospital =>
     hospital.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Generate available time slots
   useEffect(() => {
     if (!serviceDate) return;
 
@@ -49,19 +45,16 @@ const EmergencyMedicalPage = () => {
     setAvailableTimes(times);
   }, [serviceDate]);
 
-  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Validate inputs
     if (!selectedHospital || !phone || !description || !selectedTimeSlot) {
       alert('Please fill in all fields');
       return;
     }
-    
-    // Extract start hour from time slot
-    const startHour = parseInt(selectedTimeSlot.split(':')[0]); // Explicitly get first number
-    const serviceTime = serviceDate ? new Date(serviceDate) : new Date();   // Default to current date if not provided
+
+    const startHour = parseInt(selectedTimeSlot.split(':')[0]);
+    const serviceTime = serviceDate ? new Date(serviceDate) : new Date();
     serviceTime.setHours(startHour, 0, 0, 0);
 
     const helsinkiTimeString = serviceTime.toLocaleString("fi-FI", {
@@ -73,16 +66,15 @@ const EmergencyMedicalPage = () => {
       minute: "2-digit",
     });
 
-    // Check for existing bookings
     let existingRequests = [];
     try {
       const storedRequests = localStorage.getItem('emergencyRequests');
       existingRequests = storedRequests ? JSON.parse(storedRequests) : [];
     } catch (e) {
       console.error("Error reading from localStorage:", e);
-      return;   // Stop submission
+      return;
     }
-    
+
     const hasDuplicate = existingRequests.some(request => {
       const requestServiceTime = new Date(request.serviceTimeRaw);
       return (
@@ -100,7 +92,6 @@ const EmergencyMedicalPage = () => {
       return;
     }
 
-    // Proceed with submission if no duplicate
     const confirmation = {
       hospital: selectedHospital,
       phone,
@@ -111,31 +102,28 @@ const EmergencyMedicalPage = () => {
       caseId: `EM-${Date.now()}`
     };
 
-    // Store in localStorage (simulating database)
     try {
       localStorage.setItem('emergencyRequests', JSON.stringify([...existingRequests, confirmation]));
     } catch (e) {
       console.error('Error writing to localStorage:', e);
       return;
-    }  
-    
+    }
+
     setConfirmationData(confirmation);
     setSubmissionSuccess(true);
-
-    // Reset form
     setSelectedHospital('');
     setPhone('');
     setDescription('');
     setEmergencyLevel('medium');
     setSelectedTimeSlot('');
-    setServiceDate(null)
+    setServiceDate(null);
   };
-  
+
   return (
-    <div className="page-layout">
-      <Sidebar />
-      <div className="main-content emergency-medical-page">
-        <Header />
+    <div className={`page-layout ${embedded ? "embedded-emergency" : ""}`}>
+      {!embedded && <Sidebar />}
+      <div className={`main-content emergency-medical-page ${embedded ? "compact" : ""}`}>
+        {!embedded && <Header />}
 
         <h2>🚑 Emergency Medical Services</h2>
 
@@ -178,7 +166,7 @@ const EmergencyMedicalPage = () => {
                     title="Please enter a valid phone number"
                   />
                 </div>
-            
+
                 <div className="form-group">
                   <label>Emergency Level:</label>
                   <div className="emergency-levels">
@@ -201,22 +189,22 @@ const EmergencyMedicalPage = () => {
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     required
-                    rows={10}
+                    rows={embedded ? 4 : 10}
                   />
                 </div>
               </div>
 
-              <div className="form-right"> 
+              <div className="form-right">
                 <div className="form-group">
                   <label>Select Service Date:</label>
                   <DatePicker
                     selected={serviceDate}
                     onChange={(date) => setServiceDate(date)}
-                    minDate={new Date()} // Disallow past dates
+                    minDate={new Date()}
                     dateFormat="dd/MM/yyyy"
                   />
                 </div>
-            
+
                 <div className="form-group">
                   <label>Available Time Slots:</label>
                   <div className="time-slots">
@@ -237,12 +225,11 @@ const EmergencyMedicalPage = () => {
                   </div>
                 </div>
               </div>
-            </div>   
+            </div>
 
             <button type="submit" className="submit-btn">
               Request Emergency Service
             </button>
-
           </form>
         ) : (
           <div className="confirmation-message">
@@ -251,7 +238,7 @@ const EmergencyMedicalPage = () => {
             <p><strong>Hospital:</strong> {confirmationData.hospital}</p>
             <p><strong>Service Time:</strong> {confirmationData.serviceTime}</p>
             <p>We will contact you shortly at {confirmationData.phone}</p>
-            
+
             <button
               onClick={() => {
                 setSubmissionSuccess(false);
@@ -268,7 +255,7 @@ const EmergencyMedicalPage = () => {
               Make Another Request
             </button>
           </div>
-        )}  
+        )}
       </div>
     </div>
   );

@@ -13,6 +13,7 @@ const Signup = () => {
   // ✅ Handle Signup
   const handleSignup = async (e) => {
     e.preventDefault();
+  
     const trimmedSSN = ssn.trim();
     const trimmedName = name.trim();
     const trimmedPassword = password.trim();
@@ -25,26 +26,21 @@ const Signup = () => {
     }
   
     const userId = Date.now().toString();
-    existingUsers[trimmedSSN] = { id: userId, name: trimmedName, password: trimmedPassword };
+    existingUsers[trimmedSSN] = {
+      id: userId,
+      name: trimmedName,
+      password: trimmedPassword
+    };
+  
     localStorage.setItem("users", JSON.stringify(existingUsers));
-  
-    try {
-      await axios.post("http://localhost:5001/users", {
-        SSN: trimmedSSN,
-        name: trimmedName,
-        password: trimmedPassword,
-      });
-    } catch (err) {
-      console.error("Failed to sync with backend:", err);
-      setError("⚠️ Could not save to server. Try again later.");
-      return;
-    }
-  
     localStorage.setItem("userId", userId);
     localStorage.setItem("userName", trimmedName);
     localStorage.setItem("ssn", trimmedSSN);
+  
+    // ✅ Navigate to dashboard after signup
     navigate("/dashboard");
   };
+  
   
   
 
