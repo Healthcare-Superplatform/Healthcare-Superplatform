@@ -84,6 +84,7 @@ const AIHealthAssistant = () => {
           <li>✅ Symptom checker + follow-ups.</li>
           <li>✅ Triage and explanation engine.</li>
           <li>✅ Medicine lookup.</li>
+          <li>✅ Emergency services.</li>
           <li>✅ Voice & multilingual input.</li>
           <li>✅ Keyword search & Q&A.</li>
           <li>✅ Feedback system.</li>
@@ -274,6 +275,7 @@ if (emergencyKeywords.some((kw) => lowerInput.includes(kw))) {
                 <li>✅ Symptom checker + follow-ups.</li>
                 <li>✅ Triage and explanation engine.</li>
                 <li>✅ Medicine lookup.</li>
+                <li>✅ Emergency services.</li>
                 <li>✅ Voice & multilingual input.</li>
                 <li>✅ Keyword search & Q&A.</li>
                 <li>✅ Feedback system.</li>
