@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
@@ -27,6 +26,7 @@ const MedicalRecordsPage = () => {
   const [checking, setChecking] = useState(true);
   const [loginKey, setLoginKey] = useState(0);
   const [records, setRecords] = useState([]);
+  // eslint-disable-next-line no-unused-vars
   const [firstSession, setFirstSession] = useState(!localStorage.getItem('firstSessionDone'));
 
   useEffect(() => {
@@ -53,6 +53,7 @@ const MedicalRecordsPage = () => {
     localStorage.setItem('firstSessionDone', 'true');
   };
 
+  // eslint-disable-next-line no-unused-vars
   const handleLogout = () => {
     localStorage.removeItem('ssn');
     localStorage.removeItem('userId');
@@ -100,7 +101,6 @@ const MedicalRecordsPage = () => {
                 : recordCategories.find((c) => c.id === activeTab)?.label.toLowerCase()}{' '}
               records
             </p>
-            {/* Prevention view div */}
             {preventionTips.length > 0 && (
               <div className="prevention-section">
                 <h4>Prevention Tips Based on Your Records:</h4>
