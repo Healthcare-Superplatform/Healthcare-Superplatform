@@ -2,18 +2,40 @@ const mongoose = require('mongoose');
 
 const medicalRecordSchema = new mongoose.Schema({
   SSN: { type: String, required: true },
-  recordType: { 
-    type: String, 
+
+  // Include all possible record types (add 'treatment_plan')
+  recordType: {
+    type: String,
     required: true,
-    enum: ['lab_result', 'vital_sign', 'imaging', 'prescription', 'vaccination', 'procedure']
+    enum: [
+      'lab_result',
+      'vital_sign',
+      'imaging',
+      'prescription',
+      'vaccination',
+      'procedure',
+      'treatment_plan'  // ✅ Added for compatibility
+    ]
   },
+
   title: { type: String, required: true },
   date: { type: Date, required: true },
-  values: mongoose.Schema.Types.Mixed, // Flexible structure for different record types
-  flags: [{ type: String }], // e.g., ['abnormal', 'critical']
-  notes: String,
-  provider: String,
+
+  // Keep it flexible to support various structures
+  values: mongoose.Schema.Types.Mixed,
+
+  // Optional flags like 'abnormal', 'elevated', etc.
+  flags: [{ type: String }],
+
+  // Optional additional notes
+  notes: { type: String },
+
+  // Doctor, hospital, clinic etc.
+  provider: { type: String },
+
+  // If archived, hide from normal views
   archived: { type: Boolean, default: false }
+
 }, { timestamps: true });
 
 module.exports = mongoose.model('MedicalRecord', medicalRecordSchema, 'medical_records');

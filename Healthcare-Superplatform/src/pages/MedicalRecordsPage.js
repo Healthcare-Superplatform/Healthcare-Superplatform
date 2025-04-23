@@ -76,7 +76,7 @@ const MedicalRecordsPage = () => {
   if (!isLoggedIn) return <Login setIsLoggedIn={handleLoginSuccess} key={`login-${loginKey}`} />;
 
   return (
-    <div className="medical-records-page" key={`records-${loginKey}`}>
+    <div className="medical-records-page-embedded" key={`records-${loginKey}`}>
       <Sidebar />
       <div className="main-content">
         <Header title="Medical Records" />
@@ -93,14 +93,6 @@ const MedicalRecordsPage = () => {
           </div>
 
           <div className="health-summary">
-            <h3>Health Summary</h3>
-            <p>
-              Viewing{' '}
-              {activeTab === 'all'
-                ? 'all'
-                : recordCategories.find((c) => c.id === activeTab)?.label.toLowerCase()}{' '}
-              records
-            </p>
             {preventionTips.length > 0 && (
               <div className="prevention-section">
                 <h4>Prevention Tips Based on Your Records:</h4>

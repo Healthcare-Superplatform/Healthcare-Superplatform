@@ -102,7 +102,7 @@ const ChatInput = ({ input, setInput, onSend }) => {
       clearTimeout(silenceTimer.current);
       silenceTimer.current = setTimeout(() => {
         recognition.stop(); // Stop after ~3s of silence
-      }, 3500);
+      }, 2000);
     };
 
     recognition.onstart = () => {

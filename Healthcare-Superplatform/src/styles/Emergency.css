@@ -264,20 +264,21 @@
 }
 
 .embedded-emergency .main-content {
-  width: 100% !important;
-  margin: 0 auto !important;
-  padding: 16px !important;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  max-height: 500px;
+  padding: 16px;
   box-sizing: border-box;
-  background: #fff;
 }
 
+
 .embedded-emergency .emergency-form {
-  width: 100% !important;
-  max-width: 100% !important;
-  padding: 0;
+  flex: 1;
+  overflow-y: auto;
+  max-height: 100%;
+  padding-bottom: 100px; /* ✅ Extra bottom space for button visibility */
   box-sizing: border-box;
-  background: #f9f9f9;
-  border-radius: 8px;
 }
 
 .embedded-emergency .form-columns {
@@ -297,27 +298,20 @@
 }
 
 .embedded-emergency .submit-btn {
-  width: 100% !important;
-  max-width: 100% !important;
+  margin-top: 16px;
+  width: 100%;
+  max-width: 100%;
   box-sizing: border-box;
   display: block;
-  margin: 16px auto 0;
-  font-size: 16px;
-  padding: 14px;
-  border-radius: 6px;
-  text-align: center;
+  position: relative;
 }
 
-    
+.message-component-wrapper {
+  max-height: none; /* Or auto */
+  overflow: visible;
+  padding: 0;
+}
 
-    .message-component-wrapper {
-      width: 100% !important;
-      max-width: 100%;
-      padding: 0 !important;
-      overflow: visible !important;
-      box-sizing: border-box;
-    }
-    
   
   /* Optional: Scrollable container inside chat */
   .scrollable-message {

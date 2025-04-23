@@ -6,26 +6,48 @@ const MONGODB_URI = 'mongodb+srv://pankajchakrabarty22:P%40nkaj2025@superplatfor
 async function seedData() {
   try {
     await mongoose.connect(MONGODB_URI);
-    
     console.log('✅ Connected to MongoDB');
-    
-   
+
     await MedicalRecord.deleteMany({});
-    
-   
+
     const sampleRecords = [
       {
         SSN: '1',
         recordType: 'lab_result',
-        title: 'Complete Blood Count',
-        date: new Date('2023-10-15'),
+        title: 'Malaria Detection',
+        date: new Date(),
         values: {
-          hemoglobin: 13.5,
-          wbc: 6.2,
-          platelets: 250,
+          result: 'Malaria',
+          hemoglobin: 12.1,
+          wbc: 4.5
+        },
+        provider: 'Apollo Diagnostics',
+        flags: ['abnormal']
+      },
+      {
+        SSN: '1',
+        recordType: 'vital_sign',
+        title: 'Blood Pressure',
+        date: new Date(),
+        values: {
+          systolic: 140,
+          diastolic: 90,
+          result: 'Hypertension'
+        },
+        provider: 'Family Clinic',
+        flags: ['elevated']
+      },
+      {
+        SSN: '1',
+        recordType: 'treatment_plan',
+        title: 'Malaria Medication',
+        date: new Date(),
+        values: {
+          medicine: 'Artemisinin',
+          dosage: '2 tablets daily',
           result: 'Malaria'
         },
-        provider: 'LabCorp'
+        provider: 'Dr. Sharma'
       },
       {
         SSN: '2',
@@ -53,7 +75,6 @@ async function seedData() {
         flags: ['abnormal'],
         provider: 'Dr. K'
       }
-
     ];
 
     await MedicalRecord.insertMany(sampleRecords);
