@@ -1,0 +1,179 @@
+/* Workforce Page Layout */
+.page-layout {
+    display: flex;
+    height: 100vh;
+  }
+  
+  /* Main Content Area */
+  .main-content {
+    flex: 1;
+    padding: 20px;
+    margin-left: 240px; /* Adjust according to sidebar */
+    box-sizing: border-box;
+  }
+  
+  /* Emergency Medical Page */
+  .emergency-medical-page {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .emergency-form {
+    background: #f9f9f9;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    width: 100%;
+  }
+  
+  .form-columns {
+    display: flex;
+    gap: 10px;
+    padding: 0;
+    max-width: 100%;
+  }
+  .form-left, .form-right {
+    flex: 1;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    min-width: 0;
+  }
+  .form-left {
+    background: #f9fff7;
+  }
+  .form-right {
+    background: #faffff;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+  }
+  .form-group input[type="text"],
+  .form-group input[type="tel"],
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    box-sizing: border-box;
+  }
+  textarea {
+    min-height: 250px;
+    width: 100%;
+  }
+  .searchable-dropdown {
+    position: relative;
+  }
+  .searchable-dropdown input {
+    width: calc(100%-2px);                      
+    margin-bottom: 10px;
+  }
+  
+  .emergency-levels {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .level-btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s;
+  }
+  .level-btn.active {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #007bff;
+  }
+  .level-btn.low { background: #28a745; color: white; }
+  .level-btn.medium { background: #ffc107; color: white; }
+  .level-btn.high { background: #fd7e14; color: white; }
+  .level-btn.critical { background: #dc3545; color: white; }
+  
+  .time-slots {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .time-slot {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 6px;
+    text-align: center;
+  }
+  .time-slot input[type="radio"] {
+    display: none;
+  }
+  .time-slot input[type="radio"]:checked + label {
+    background: #007bff;
+    color: white;
+  }
+  .time-slot label {
+    display: block;
+    padding: 4px 6px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 14px;
+  }
+  
+  .submit-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 20px;
+    font-weight: 600;
+    transition: background 0.3s;
+    display: block;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .submit-btn:hover {
+    background:rgb(137, 35, 200);
+  }
+  
+  .confirmation-message {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 8px;
+    border-left: 5px solid #28a745;
+  }
+  .confirmation-message h3 {
+    color: #28a745;
+    margin-top: 0;
+  }
+  
+  .new-request-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    margin-top: 20px;
+    cursor: pointer;
+  }
+  
+  /* Adjust for Collapsed Sidebar on Mobile */
+  @media screen and (max-width: 768px) {
+    .main-content {
+      margin-left: 60px;
+    }
+  }
