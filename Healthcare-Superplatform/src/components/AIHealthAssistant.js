@@ -128,9 +128,20 @@ const AIHealthAssistant = () => {
 
     const logoutKeywords = ["logout", "log out", "sign out"];
     if (logoutKeywords.some((kw) => lowerInput.includes(kw))) {
-      localStorage.clear();
+      // Only remove login session, not signup info
+      localStorage.removeItem("ssn");
+      localStorage.removeItem("userId");
+      localStorage.removeItem("userName");
+    
       setLoggedInUser(null);
-      setMessages((prev) => [...prev, { sender: "bot", type: "text", text: "✅ You’ve been successfully logged out." }]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "bot",
+          type: "text",
+          text: "✅ You’ve been successfully logged out.",
+        },
+      ]);
       return;
     }
     const emergencyKeywords = ["emergency", "emergency service", "emergency services", "emergencies"];
