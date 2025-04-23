@@ -99,7 +99,7 @@ const MedicalRecordsPage = () => {
                 : recordCategories.find((c) => c.id === activeTab)?.label.toLowerCase()}{' '}
               records
             </p>
-
+            {/* Prevention view div */}
             {preventionTips.length > 0 && (
               <div className="prevention-section">
                 <h4>Prevention Tips Based on Your Records:</h4>
