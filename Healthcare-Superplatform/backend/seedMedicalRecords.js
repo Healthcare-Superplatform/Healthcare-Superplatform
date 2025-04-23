@@ -23,7 +23,7 @@ async function seedData() {
           hemoglobin: 13.5,
           wbc: 6.2,
           platelets: 250,
-          result: 'Normal'
+          result: 'Malaria'
         },
         provider: 'LabCorp'
       },
@@ -34,7 +34,8 @@ async function seedData() {
         date: new Date('2023-11-01'),
         values: {
           systolic: 138,
-          diastolic: 88
+          diastolic: 88,
+          result: 'COVID-19'
         },
         flags: ['elevated'],
         provider: 'Dr. Smith'
@@ -46,7 +47,8 @@ async function seedData() {
         date: new Date('2023-11-01'),
         values: {
           systolic: 138,
-          diastolic: 88
+          diastolic: 88,
+          result: 'Cholera'
         },
         flags: ['abnormal'],
         provider: 'Dr. K'

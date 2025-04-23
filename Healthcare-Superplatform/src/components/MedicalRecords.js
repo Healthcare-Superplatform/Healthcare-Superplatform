@@ -21,18 +21,17 @@ const transformRecords = (rawData, filter) => {
   }, []);
 };
 
-const MedicalRecords = ({ filter }) => {
+const MedicalRecords = ({ filter, onRecordsLoaded }) => {
   const [transformedRecords, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // ✅ Get SSN from localStorage
   const ssn = localStorage.getItem('ssn');
 
   useEffect(() => {
     if (!ssn) {
-      navigate('/login'); // 🔒 Redirect if not logged in
+      navigate('/login');
       return;
     }
 
@@ -44,7 +43,11 @@ const MedicalRecords = ({ filter }) => {
           throw new Error('Invalid data format received');
         }
 
-        setRecords(transformRecords(response.data, filter));
+        const transformed = transformRecords(response.data, filter);
+        setRecords(transformed);
+        if (onRecordsLoaded) {
+          onRecordsLoaded(transformed);
+        }
       } catch (err) {
         setError({
           message: err.response?.data?.message || err.message,
@@ -56,7 +59,7 @@ const MedicalRecords = ({ filter }) => {
     };
 
     fetchData();
-  }, [ssn, filter, navigate]);
+  }, [ssn, filter, navigate, onRecordsLoaded]);
 
   const renderRecord = record => (
     <div key={record.id || record._id} className="record-card">
@@ -97,6 +100,7 @@ const MedicalRecords = ({ filter }) => {
 
 MedicalRecords.propTypes = {
   filter: PropTypes.string.isRequired,
+  onRecordsLoaded: PropTypes.func,
 };
 
 export default MedicalRecords;

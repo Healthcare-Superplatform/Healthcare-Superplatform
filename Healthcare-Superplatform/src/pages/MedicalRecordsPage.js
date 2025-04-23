@@ -5,29 +5,60 @@ import MedicalRecords from '../components/MedicalRecords';
 import RecordCategoryTabs from '../components/RecordCategoryTabs';
 import Login from './Login';
 import '../styles/MedicalRecordsPage.css';
+import diseasePreventionList from '../api/diseasePreventionList';
+
+const getDetectedDiseases = (records) =>
+  records
+    .map((record) => record.values?.result)
+    .filter((val) => typeof val === 'string')
+    .map((val) => val.trim().toLowerCase());
+
+const getPreventionTips = (records) => {
+  const detected = getDetectedDiseases(records);
+  return diseasePreventionList.filter((item) =>
+    detected.includes(item.disease.toLowerCase())
+  );
+};
 
 const MedicalRecordsPage = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [checking, setChecking] = useState(true);
   const [loginKey, setLoginKey] = useState(0);
-  const [firstSession, setFirstSession] = useState(!localStorage.getItem("firstSessionDone"));
+  const [records, setRecords] = useState([]);
+  const [firstSession, setFirstSession] = useState(!localStorage.getItem('firstSessionDone'));
 
   useEffect(() => {
     const ssn = localStorage.getItem('ssn');
     const userId = localStorage.getItem('userId');
 
-    // ✅ Validate session
     if (ssn && userId && ssn !== 'null' && userId !== 'null') {
       setIsLoggedIn(true);
     } else {
-      localStorage.removeItem("ssn");
-      localStorage.removeItem("userId");
-      localStorage.removeItem("userName");
+      localStorage.removeItem('ssn');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('userName');
       setIsLoggedIn(false);
     }
     setChecking(false);
   }, [loginKey]);
+
+  const handleTabChange = (tabId) => setActiveTab(tabId);
+
+  const handleLoginSuccess = () => {
+    setIsLoggedIn(true);
+    setLoginKey((prev) => prev + 1);
+    setFirstSession(false);
+    localStorage.setItem('firstSessionDone', 'true');
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('ssn');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userName');
+    setIsLoggedIn(false);
+    setLoginKey((prev) => prev + 1);
+  };
 
   const recordCategories = [
     { id: 'all', label: 'All Records' },
@@ -37,24 +68,7 @@ const MedicalRecordsPage = () => {
     { id: 'treatment', label: 'Treatments' },
   ];
 
-  const handleTabChange = (tabId) => {
-    setActiveTab(tabId);
-  };
-
-  const handleLoginSuccess = () => {
-    setIsLoggedIn(true);
-    setLoginKey(prev => prev + 1);
-    setFirstSession(false);
-    localStorage.setItem("firstSessionDone", "true");
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('ssn');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('userName');
-    setIsLoggedIn(false);
-    setLoginKey(prev => prev + 1);
-  };
+  const preventionTips = getPreventionTips(records);
 
   if (checking) return <div>🔒 Checking authentication...</div>;
   if (!isLoggedIn) return <Login setIsLoggedIn={handleLoginSuccess} key={`login-${loginKey}`} />;
@@ -79,7 +93,7 @@ const MedicalRecordsPage = () => {
           />
 
           <div className="records-section">
-            <MedicalRecords filter={activeTab} />
+            <MedicalRecords filter={activeTab} onRecordsLoaded={setRecords} />
           </div>
 
           <div className="health-summary">
@@ -91,6 +105,22 @@ const MedicalRecordsPage = () => {
                 : recordCategories.find((c) => c.id === activeTab)?.label.toLowerCase()}{' '}
               records
             </p>
+
+            {preventionTips.length > 0 && (
+              <div className="prevention-section">
+                <h4>Prevention Tips Based on Your Records:</h4>
+                {preventionTips.map((item) => (
+                  <div key={item.disease}>
+                    <strong>{item.disease}</strong>
+                    <ul>
+                      {item.prevention.map((tip, idx) => (
+                        <li key={idx}>{tip}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
