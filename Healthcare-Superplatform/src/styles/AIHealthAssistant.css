@@ -1,18 +1,22 @@
 /* Main Container - Adjusts to Window Size */
 .ai-health-assistant {
-  width: 80vw; /* Adjusts to 80% of the viewport width */
-  max-width: 800px; /* Maximum width to prevent excessive stretching */
+  width: 90vw; /* Adjusts to 90% of the viewport width */
+  max-width: 960px; /* Maximum width to prevent excessive stretching */
   margin: auto;
   text-align: center;
   background: #f5f5f5;
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  box-sizing: border-box;
 }
 
 /* Responsive Chatbox */
 .chatbox {
-  height: 70vh; /* Adjusts dynamically to 70% of viewport height */
+  flex: 1;
   width: 100%;
   overflow-y: auto;
   border: 1px solid #ccc;
@@ -23,6 +27,7 @@
   font-size: 16px;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
 }
 
 /* Chat messages */
@@ -51,58 +56,64 @@
   text-align: left;
 }
 
-/* Chat Input - Adjusts to Screen */
+/* Chat Input - aligned full width */
 .chat-input {
   display: flex;
-  margin-top: 15px;
-  width: 100%;
+  align-items: center;
+  gap: 10px;
   padding: 10px;
-  background: #fff;
   border-top: 1px solid #ccc;
-  position: sticky;
-  bottom: 0;
+  background: #fff;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* Input field */
+/* Input field - take remaining space */
 .chat-input input {
   flex: 1;
   padding: 12px;
   border-radius: 8px;
   border: 1px solid #ccc;
   font-size: 16px;
-  width: 100%;
 }
 
-/* Send Button */
+/* Send & Mic Buttons */
 .chat-input button {
   padding: 12px 20px;
-  border: none;
-  background: #0084ff;
+  height: 44px;
+  background: #007bff;
   color: white;
+  border: none;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: bold;
-  margin-left: 10px;
 }
 
 .chat-input button:hover {
-  background: #006de0;
+  background: #005fc2;
+}
+
+.chat-input select {
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 14px;
 }
 
 /* Mobile Optimization */
 @media screen and (max-width: 600px) {
   .ai-health-assistant {
-    width: 95vw; /* Full width on small screens */
-    padding: 15px;
+    width: 95vw;
+    padding: 10px;
   }
 
   .chatbox {
-    height: 65vh; /* Slightly smaller on mobile */
+    flex: 1;
+    height: 55vh;
   }
 
   .chat-input {
-    flex-direction: column; /* Stack input and button vertically */
+    flex-direction: column;
   }
 
   .chat-input button {
@@ -110,6 +121,7 @@
     margin-top: 5px;
   }
 }
+
 .feedback-fullscreen-toggle {
   position: fixed;
   bottom: 10px;
@@ -131,3 +143,54 @@
   margin: 30px auto;
 }
 
+.instruction-box {
+  margin-bottom: 20px;
+  background: #fff;
+  padding: 16px;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.instruction-box strong {
+  display: block;
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.info-btn {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  font-size: 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.info-btn:hover {
+  background-color: #2980b9;
+  transform: scale(1.03);
+}
+
+.info-box {
+  margin-top: 16px;
+  padding: 14px;
+  background: #f0f9ff;
+  border-left: 5px solid #3498db;
+  border-radius: 8px;
+  text-align: left;
+  font-size: 14px;
+  color: #333;
+}
