@@ -162,7 +162,7 @@ if (emergencyKeywords.some((kw) => lowerInput.includes(kw))) {
       return;
     }
     
-    const recordKeywords = ["medical record", "records"];
+    const recordKeywords = ["medical record", "records", "record", "medical records"];
     const healthKeywords = ["my health", "health info"];
 
     if (recordKeywords.some((kw) => lowerInput.includes(kw))) {
