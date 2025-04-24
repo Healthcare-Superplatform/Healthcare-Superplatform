@@ -25,7 +25,7 @@ app.use('/api/feedback', feedbackRoutes);
 
 // Connect to MongoDB
 // Connect to MongoDB Atlas
-mongoose.connect('mongodb+srv://pankajchakrabarty22:P%40nkaj2025@superplatform-backend.u6aoy.mongodb.net/superplatform-backend?retryWrites=true&w=majority&appName=superplatform-backend', {
+mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })

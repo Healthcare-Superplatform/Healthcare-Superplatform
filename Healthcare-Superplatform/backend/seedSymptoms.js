@@ -1,4 +1,10 @@
-[
+const mongoose = require('mongoose');
+const Symptom = require('./models/Symptom'); // schema remains in models folder
+
+const MONGODB_URI = 'mongodb+srv://pankajchakrabarty22:P%40nkaj2025@superplatform-backend.u6aoy.mongodb.net/superplatform-backend?retryWrites=true&w=majority';
+
+const symptoms = [
+
   {
     "id": 1,
     "name": "Headache",
@@ -2870,4 +2876,26 @@
       "Minor or temporary sensitivity to touch"
     ]
   }
-]
+];
+
+async function seedSymptoms() {
+  try {
+    await mongoose.connect(MONGODB_URI);
+    console.log('✅ Connected to MongoDB');
+
+    await Symptom.deleteMany({});
+    console.log('🧹 Cleared existing symptom data');
+
+    await Symptom.insertMany(symptoms);
+    console.log(`✅ Inserted ${symptoms.length} symptoms`);
+
+    process.exit(0);
+  } catch (error) {
+    console.error('❌ Failed to seed symptoms:', error);
+    process.exit(1);
+  } finally {
+    await mongoose.disconnect();
+  }
+}
+
+seedSymptoms();
